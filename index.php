@@ -9,7 +9,7 @@ $logo = asset_url($assets['logoUrl'] ?? '');
 $vehicles = [
     ['key' => 'vehicle16ImageUrl', 'title' => 'Xe 16 chỗ', 'items' => ['Phù hợp: gia đình, nhóm nhỏ 10–14 người.', 'Ưu điểm: linh hoạt, dễ di chuyển, chi phí thấp.', 'Tiện nghi: cơ bản, máy lạnh, ghế tiêu chuẩn.', 'Cảm giác: gần gũi, không quá rộn.']],
     ['key' => 'vehicle29ImageUrl', 'title' => 'Xe 29 chỗ thường', 'items' => ['Phù hợp: nhóm trung bình 15–25 người.', 'Ưu điểm: cân bằng giữa chi phí và sức chứa.', 'Tiện nghi: cơ bản, đủ dùng cho chuyến đi vừa phải.', 'Cảm giác: rộng, thoải mái.']],
-    ['key' => 'vehicleLimoImageUrl', 'title' => 'Xe 29 chỗ Limousine', 'items' => ['Phù hợp: nhóm nhỏ - trung muốn trải nghiệm cao cấp.', 'Ưu điểm: ghế VIP, không gian rộng, riêng tư.', 'Tiện nghi: ghế massage, wifi, cổng sạc.', 'Cảm giác: sang trọng như hạng thương gia.']],
+    ['key' => 'vehicleLimoImageUrl', 'title' => 'Xe 29 chỗ Limousine', 'items' => ['Phù hợp: nhóm trung bình 15–25 người.', 'Ưu điểm: ghế VIP, không gian rộng, riêng tư.', 'Tiện nghi: ghế massage, wifi, cổng sạc.', 'Cảm giác: sang trọng như hạng thương gia.']],
     ['key' => 'vehicle45ImageUrl', 'title' => 'Xe 45 chỗ', 'items' => ['Phù hợp: đoàn lớn, công ty, tour đông người.', 'Ưu điểm: tiết kiệm chi phí theo đầu người.', 'Tiện nghi: tiêu chuẩn, rộng rãi cho đi tập thể.', 'Cảm giác: thoáng, phù hợp lịch trình dài.']],
 ];
 
@@ -29,7 +29,7 @@ $reviews = [
   <title><?= e($config['brandName'] ?? 'NAM THẮNG TRAVEL BUS') ?></title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/styles.css?v=<?= rawurlencode(APP_VERSION) ?>">
   <script>
     window.APP_CONFIG = <?= json_encode([
@@ -52,7 +52,7 @@ $reviews = [
 
     <div class="header-actions">
       <a class="btn btn-secondary" href="<?= e($config['hotlineHref'] ?? 'tel:0923098098') ?>">TƯ VẤN THUÊ XE</a>
-      <button class="btn btn-primary" type="button" data-scroll-form>THAM GIA NHẬN MAGIC TICKET</button>
+      <button class="btn btn-primary magic-ticket-btn" type="button" data-scroll-form>THAM GIA NHẬN MAGIC TICKET</button>
     </div>
   </div>
 </header>
@@ -96,26 +96,99 @@ $reviews = [
 
   <section class="section" id="tai-sao-chon">
     <div class="container">
-      <h2 class="section-title vehicle-image-title">HƠN 1000+ KHÁCH HÀNG TIN CHỌN NAM THẮNG</h2>
-      <?php $whyImage = asset_url($assets['whySectionImageUrl'] ?? 'https://drive.google.com/file/d/1fTYX673ygi37P2oOtu9ssgqoTHWlKZlL/view'); ?>
-      <?php if ($whyImage): ?>
-        <div class="why-image-card">
-          <img src="<?= e($whyImage) ?>" alt="Các dòng xe của Nam Thắng Travel Bus" loading="lazy">
+      <div class="why-custom-card" aria-labelledby="whyCustomTitle">
+        <h2 id="whyCustomTitle">HƠN <span>1000+ KHÁCH HÀNG</span> TIN CHỌN NAM THẮNG TRAVEL BUS</h2>
+        <div class="why-feature-list">
+          <article class="why-feature">
+            <div class="why-feature-icon" aria-hidden="true">
+              <svg class="why-logo-icon" viewBox="0 0 64 64">
+                <rect x="14" y="10" width="36" height="42" rx="6" fill="#70be3a"/>
+                <path d="M19 17h26v18H19z" fill="#263f39"/>
+                <path d="M22 20h20v12H22z" fill="#315f7f"/>
+                <path d="M18 39h28" stroke="#0f7f41" stroke-width="4" stroke-linecap="round"/>
+                <circle cx="22" cy="46" r="4" fill="#263f39"/>
+                <circle cx="42" cy="46" r="4" fill="#263f39"/>
+                <path d="M19 55h8M37 55h8" stroke="#263f39" stroke-width="4" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="why-feature-copy">
+              <h3>XE ĐỜI MỚI 2026</h3>
+              <p>Ghế ngồi êm ái, rộng rãi, nhiều tiện ích mới trên xe</p>
+            </div>
+          </article>
+
+          <article class="why-feature why-feature-reverse">
+            <div class="why-feature-icon" aria-hidden="true">
+              <svg class="why-logo-icon" viewBox="0 0 64 64">
+                <circle cx="32" cy="32" r="27" fill="#8bc63f"/>
+                <circle cx="32" cy="27" r="9" fill="#ffd4a3"/>
+                <path d="M21 25h22l-3-8H24l-3 8Z" fill="#0f7f41"/>
+                <path d="M24 24h16" stroke="#0b6634" stroke-width="3" stroke-linecap="round"/>
+                <path d="M19 53c2.6-9 7.1-13 13-13s10.4 4 13 13H19Z" fill="#0f7f41"/>
+                <path d="M28 41l4 6 4-6" fill="#ffffff"/>
+                <circle cx="28" cy="29" r="1.5" fill="#263f39"/>
+                <circle cx="36" cy="29" r="1.5" fill="#263f39"/>
+                <path d="M28 34c2.5 1.8 5.5 1.8 8 0" stroke="#9b5e31" stroke-width="2.4" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="why-feature-copy">
+              <h3>TÀI XẾ KINH NGHIỆM ĐƯỜNG DÀI</h3>
+              <p>Lái an toàn, đúng lịch trình, hạn chế say xe cho người lớn tuổi và trẻ nhỏ</p>
+            </div>
+          </article>
+
+          <article class="why-feature">
+            <div class="why-feature-icon" aria-hidden="true">
+              <svg class="why-logo-icon" viewBox="0 0 64 64">
+                <rect x="13" y="13" width="38" height="38" rx="8" fill="#8bc63f"/>
+                <rect x="21" y="21" width="22" height="22" rx="4" fill="none" stroke="#0f7f41" stroke-width="5"/>
+                <path d="M25 32l5 5 10-12" fill="none" stroke="#0f7f41" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="why-feature-copy">
+              <h3>ĐA DẠNG LỰA CHỌN</h3>
+              <p>Với hệ thống xe từ 4-7-16-29-45 chỗ, đáp ứng mọi nhu cầu di chuyển</p>
+            </div>
+          </article>
+
+          <article class="why-feature why-feature-reverse">
+            <div class="why-feature-icon" aria-hidden="true">
+              <svg class="why-logo-icon" viewBox="0 0 64 64">
+                <circle cx="32" cy="32" r="27" fill="#8bc63f"/>
+                <circle cx="32" cy="32" r="18" fill="#0f7f41"/>
+                <circle cx="32" cy="32" r="13" fill="#8bc63f"/>
+                <path d="M32 22v11l8 5" fill="none" stroke="#0f7f41" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="why-feature-copy">
+              <h3>CHỦ ĐỘNG THỜI GIAN</h3>
+              <p>Toàn bộ lịch trình được linh hoạt theo kế hoạch của đoàn di chuyển</p>
+            </div>
+          </article>
         </div>
-      <?php endif; ?>
+      </div>
     </div>
   </section>
 
   <section class="section" id="magic-ticket">
     <div class="container checkin-wrap">
       <div class="howto-card">
-        <h2>CHECK-IN NGAY – NHẬN MAGIC TICKET LIỀN TAY</h2>
+        <h2 class="checkin-title">CHECK-IN NGAY – NHẬN MAGIC TICKET LIỀN TAY</h2>
         <?php $guide = asset_url($assets['checkinGuideImageUrl'] ?? ''); ?>
         <?php if ($guide): ?><img class="guide-img" src="<?= e($guide) ?>" alt="Thể lệ tham gia" loading="lazy"><?php endif; ?>
         <div class="step"><b>1</b><span>Chụp ảnh hoặc quay video sáng tạo cùng xe Nam Thắng Travel Bus.</span></div>
         <div class="step"><b>2</b><span>Đăng công khai Facebook hoặc TikTok kèm hashtag:<br><strong>#NamThangTravelBus #TaxiNamThang #ChuyenXeThanhThoi #XeXinMienTay #SongAoTrenXe</strong></span></div>
         <div class="step"><b>3</b><span>Điền thông tin bên cạnh và nhấn <strong>NHẬN MAGIC TICKET</strong>.</span></div>
-        <div class="note-box">Sau 24h, Magic Ticket sẽ xuất hiện trong mục Ưu Đãi của App Taxi Nam Thắng. Hình ảnh: voucher 300K. Video: voucher 600K.</div>
+        <div class="note-box">
+          <strong>Lưu ý:</strong>
+          <ul>
+            <li>Voucher sẽ tự động gửi vào phần Ưu Đãi trên App Taxi Nam Thắng sau 24h.</li>
+            <li>Ảnh check-in: nhận Voucher Magic Ticket 300K</li>
+            <li>Video review: nhận Voucher Magic Ticket 600K</li>
+            <li>Voucher áp dụng toàn bộ hệ thống Taxi điện Nam Thắng tại các tỉnh Miền Tây.</li>
+            <li>Nếu chưa có ứng dụng, bạn vui lòng Tải App Taxi Nam Thắng <a href="<?= e($config['iosLink'] ?? $config['androidLink'] ?? '#') ?>" target="_blank" rel="noopener noreferrer">tại đây</a>.</li>
+          </ul>
+        </div>
       </div>
 
       <div class="form-card" id="magicTicketFormCard">
@@ -157,10 +230,10 @@ $reviews = [
   <section class="section" id="faq">
     <div class="container faq-list">
       <h2 class="section-title">Câu hỏi thường gặp khi đặt xe</h2>
-      <details open><summary>Nam Thắng Travel Bus có nhận thuê xe theo lịch trình riêng không?</summary><p>Có. Nam Thắng Travel Bus nhận lịch trình riêng theo nhu cầu gia đình, nhóm bạn, đoàn công ty và tour du lịch.</p></details>
-      <details><summary>Tôi nên chọn xe 16 chỗ, 29 chỗ hay 45 chỗ?</summary><p>Nhóm nhỏ phù hợp xe 16 chỗ. Nhóm 15–25 người phù hợp xe 29 chỗ. Đoàn lớn phù hợp xe 45 chỗ. Nếu muốn trải nghiệm cao cấp, nên chọn 29 chỗ Limousine.</p></details>
-      <details><summary>Sau bao lâu tôi nhận được Magic Ticket?</summary><p>Sau khoảng 24 giờ kể từ khi đội ngũ xác minh thông tin hợp lệ.</p></details>
-      <details><summary>Nếu tôi đăng video thay vì hình ảnh thì ưu đãi có khác không?</summary><p>Có. Bài check-in dạng hình ảnh nhận voucher 300K, còn video nhận voucher 600K sau khi xác minh hợp lệ.</p></details>
+      <details open><summary>Đặt cọc, thuê xe như thế nào và nếu lịch trình thay đổi đột ngột ra sao?</summary><p>Khách hàng liên hệ hotline hoặc Zalo để được tư vấn xe, lịch trình và chi phí. Đội ngũ Nam Thắng sẽ hỗ trợ điều chỉnh khi lịch trình phát sinh thay đổi.</p></details>
+      <details><summary>Giá thuê xe đã bao gồm tất cả các chi phí như xăng dầu, phí cầu đường, cao tốc và tiền tip cho tài xế chưa?</summary><p>Chi phí sẽ được tư vấn rõ theo từng lịch trình. Các khoản bao gồm hoặc phát sinh như xăng dầu, phí cầu đường, cao tốc và tip tài xế sẽ được xác nhận trước khi đặt xe.</p></details>
+      <details><summary>Xe Nam Thắng là dòng xe đời nào, có đầy đủ tiện nghi không?</summary><p>Nam Thắng sử dụng các dòng xe đời mới, sạch sẽ, ghế ngồi thoải mái, máy lạnh và các tiện ích phù hợp cho hành trình gia đình, nhóm bạn hoặc đoàn du lịch.</p></details>
+      <details><summary>Tài xế có rành đường không và phục vụ đoàn như thế nào?</summary><p>Tài xế có kinh nghiệm đường dài, hỗ trợ lịch trình linh hoạt, lái xe an toàn và đồng hành cùng đoàn trong suốt chuyến đi.</p></details>
     </div>
   </section>
 </main>
@@ -168,33 +241,35 @@ $reviews = [
 <footer class="footer">
   <div class="container footer-inner">
     <div class="footer-main">
-      <h3 class="footer-brand-name"><?= e($config['footerName'] ?? 'NAM THẮNG TRAVEL BUS') ?></h3>
-      <p class="footer-hotline"><?= e($config['footerContactText'] ?? 'Hotline: 0923.098.098') ?></p>
       <div class="footer-logo-wrap">
         <?php if ($logo): ?><img src="<?= e($logo) ?>" alt="Logo Nam Thắng"><?php else: ?><span>NT</span><?php endif; ?>
       </div>
+      <h3 class="footer-brand-name"><?= e($config['footerName'] ?? 'NAM THẮNG TRAVEL BUS') ?></h3>
+      <p class="footer-tagline">Chuyên nghiệp trên từng hành trình</p>
+    </div>
+
+    <div class="footer-company">
+      <h4>THÔNG TIN CÔNG TY</h4>
+      <p><strong>Trụ sở:</strong> Đường số 3 (KVBX tỉnh Kiên Giang) ấp Sua Đũa, xã Bình An, tỉnh An Giang</p>
     </div>
 
     <div class="footer-contact">
-      <h4>Liên hệ</h4>
-      <p>Hotline tư vấn thuê xe: 0923.098.098</p>
-      <p>Zalo Nam Thắng Travel Bus</p>
+      <h4>LIÊN HỆ</h4>
+      <p>Hotline: 0923 098 098</p>
+      <p>Hotline: 0918 722 944 ( Mr. Sĩ)</p>
     </div>
 
     <div class="footer-social">
-      <h4>Kênh liên kết</h4>
+      <h4>KÊNH LIÊN KẾT</h4>
       <div class="footer-social-list">
         <a href="https://www.facebook.com/namthang.travelbus" target="_blank" rel="noopener noreferrer" class="footer-social-item" aria-label="Facebook">
           <span class="footer-social-icon facebook-icon"><svg viewBox="0 0 24 24"><path d="M22 12.06C22 6.48 17.52 2 11.94 2S2 6.48 2 12.06c0 5.02 3.66 9.19 8.44 9.94v-7.03H7.9v-2.91h2.54V9.84c0-2.5 1.49-3.88 3.77-3.88 1.09 0 2.23.19 2.23.19v2.45h-1.26c-1.24 0-1.63.77-1.63 1.56v1.9h2.77l-.44 2.91h-2.33V22c4.79-.75 8.45-4.92 8.45-9.94z"/></svg></span>
-          <span>Facebook</span>
         </a>
         <a href="https://www.tiktok.com/@namthangtravelbus" target="_blank" rel="noopener noreferrer" class="footer-social-item" aria-label="TikTok">
           <span class="footer-social-icon tiktok-icon"><svg viewBox="0 0 24 24"><path d="M16.75 2c.35 2.72 1.87 4.34 4.55 4.51v3.06c-1.55.15-2.91-.36-4.46-1.31v5.72c0 7.27-7.92 9.54-11.1 4.33-2.04-3.35-.79-9.22 5.76-9.45v3.23c-.51.08-1.06.21-1.56.39-1.49.5-2.34 1.45-2.1 3.12.46 3.2 6.33 4.15 5.84-2.1V2h3.07z"/></svg></span>
-          <span>TikTok</span>
         </a>
         <a href="https://namthanggroup.vn/" target="_blank" rel="noopener noreferrer" class="footer-social-item" aria-label="Website">
           <span class="footer-social-icon website-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm6.93 6h-3.02a15.7 15.7 0 0 0-1.33-3.03A8.04 8.04 0 0 1 18.93 8zM12 4.04c.83 1.2 1.48 2.52 1.86 3.96h-3.72A13.2 13.2 0 0 1 12 4.04zM4.26 14a8.4 8.4 0 0 1 0-4h3.41a16.7 16.7 0 0 0 0 4H4.26zm.81 2h3.02c.34 1.08.79 2.1 1.33 3.03A8.04 8.04 0 0 1 5.07 16zm3.02-8H5.07a8.04 8.04 0 0 1 4.35-3.03A15.7 15.7 0 0 0 8.09 8zM12 19.96A13.2 13.2 0 0 1 10.14 16h3.72A13.2 13.2 0 0 1 12 19.96zM14.29 14H9.71a14.7 14.7 0 0 1 0-4h4.58a14.7 14.7 0 0 1 0 4zm.29 5.03c.54-.93.99-1.95 1.33-3.03h3.02a8.04 8.04 0 0 1-4.35 3.03zM16.33 14a16.7 16.7 0 0 0 0-4h3.41a8.4 8.4 0 0 1 0 4h-3.41z"/></svg></span>
-          <span>Website</span>
         </a>
       </div>
     </div>
@@ -247,20 +322,19 @@ $reviews = [
   <div class="modal promo-modal">
     <button id="closePromoBtn" class="promo-close-btn" type="button" aria-label="Đóng popup">×</button>
     <div class="promo-head">
-      <span class="promo-chip">☀️ NAM THẮNG TRAVEL BUS</span>
-      <h3 class="promo-title"><span>BẬT MOOD HÈ</span><span>NHẬN MAGIC TICKET NGAY!</span></h3>
+      <h3 class="promo-title"><span data-title="BẬT MOOD HÈ">BẬT MOOD HÈ</span><span data-title="NHẬN MAGIC TICKET NGAY!">NHẬN MAGIC TICKET NGAY!</span></h3>
     </div>
     <div class="modal-body">
-      <div class="promo-voucher-grid">
-        <div class="promo-box"><div class="voucher-label">NHẬN VOUCHER</div><strong>600K</strong><span>Đăng khoảnh khắc video</span></div>
-        <div class="promo-box"><div class="voucher-label">NHẬN VOUCHER</div><strong>300K</strong><span>Chia sẻ khoảnh khắc hình ảnh</span></div>
-      </div>
       <?php $promo = asset_url($assets['popupPromoImageUrl'] ?? ''); ?>
       <div class="promo-image-wrap">
         <?php if ($promo): ?><img class="promo-image" src="<?= e($promo) ?>" alt="Magic Ticket Nam Thắng Travel Bus"><?php else: ?><div class="promo-image-placeholder">Magic Ticket Nam Thắng Travel Bus</div><?php endif; ?>
       </div>
-      <div class="promo-footer-note"><div>*Số lượng có hạn</div><div>*Mỗi số điện thoại chỉ được đăng ký tham gia 1 lần</div></div>
-      <div class="promo-actions"><button id="joinNowBtn" class="btn btn-primary" type="button">THAM GIA NGAY</button><button id="viewRulesBtn" class="btn btn-secondary" type="button">XEM THỂ LỆ</button></div>
+      <div class="promo-voucher-grid">
+        <div class="promo-box"><div class="voucher-label">NHẬN VOUCHER</div><strong>600K</strong><span>Chia sẻ <b>Video Review</b> chuyến đi</span></div>
+        <div class="promo-box"><div class="voucher-label">NHẬN VOUCHER</div><strong>300K</strong><span>Chia sẻ <b>Ảnh Check-in</b> chuyến đi</span></div>
+      </div>
+      <ul class="promo-footer-note"><li>Số lượng có hạn</li><li>Mỗi số điện thoại chỉ được tham gia 1 lần</li></ul>
+      <div class="promo-actions"><button id="joinNowBtn" class="btn btn-primary promo-join-btn" type="button">THAM GIA NGAY</button><button id="viewRulesBtn" class="btn btn-secondary promo-rules-btn" type="button">THỂ LỆ</button></div>
     </div>
   </div>
 </div>

@@ -4,7 +4,7 @@
  * Chỉnh nội dung landing page tại đây.
  */
 
-const APP_VERSION = '2026-05-06 php-supabase';
+const APP_VERSION = '2026-05-14 promo-title-two-colors';
 
 return [
     'brandName' => 'NAM THẮNG TRAVEL BUS',
@@ -26,8 +26,8 @@ return [
     ],
     'assets' => [
         'logoUrl' => 'https://drive.google.com/file/d/1BY20HjqHOdZsMSfTeB4OwpZdUhGiwixe/view',
-        'heroBannerImageUrl' => 'https://drive.google.com/file/d/17AjauY6DTBWR9Z4lf3AjF7rqCTX7-9p6/view',
-        'popupPromoImageUrl' => 'https://drive.google.com/file/d/1t0MOqED-3L8rW6FEM8fnRFKcayOrtwT3/view', //Xong
+        'heroBannerImageUrl' => 'https://drive.google.com/file/d/1ST0KnEovyGjIbGAlG8fM46SjyvCDq-O1/view',
+        'popupPromoImageUrl' => 'https://drive.google.com/file/d/1xh3UiFhVR8bLpC4TDOxGN12YtMiyi32Z/view', //Xong
         'checkinGuideImageUrl' => 'https://drive.google.com/file/d/1WfhlfJ7gfBaXYJQcYDSnbuxoHmqkjvAG/view', //Xong
         'whySectionImageUrl' => 'https://drive.google.com/file/d/1XbEHbu9oN_klYVeK8o5VHBLRVzOpe7DQ/view',
         'vehicleDefaultImageUrl' => 'https://drive.google.com/file/d/1fTYX673ygi37P2oOtu9ssgqoTHWlKZlY/view',
