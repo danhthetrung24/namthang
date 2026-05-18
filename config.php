@@ -4,7 +4,7 @@
  * Chỉnh nội dung landing page tại đây.
  */
 
-const APP_VERSION = '2026-05-18 streaming-video-proxy';
+const APP_VERSION = '2026-05-18 why-section-card';
 
 return [
     'brandName' => 'NAM THẮNG TRAVEL BUS',
