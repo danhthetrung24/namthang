@@ -94,7 +94,7 @@ $reviews = [
           <article class="vehicle-card">
             <div class="vehicle-visual">
               <?php if ($video && $isDirectVideo): ?>
-                <video controls preload="none" playsinline <?php if ($poster): ?>poster="<?= e($poster) ?>"<?php endif; ?>>
+                <video controls preload="metadata" playsinline <?php if ($poster): ?>poster="<?= e($poster) ?>"<?php endif; ?>>
                   <source src="<?= e($videoSrc) ?>" type="video/mp4">
                 </video>
               <?php elseif ($video): ?>
