@@ -54,7 +54,7 @@ function asset_url(?string $url): string
         return 'image.php?id=' . rawurlencode($id);
     }
 
-    return $raw;
+    return public_file_url($raw);
 }
 
 function drive_preview_url(?string $url): string
@@ -67,7 +67,32 @@ function drive_preview_url(?string $url): string
         return 'https://drive.google.com/file/d/' . rawurlencode($id) . '/preview';
     }
 
-    return $raw;
+    return public_file_url($raw);
+}
+
+function public_file_url(?string $url): string
+{
+    $raw = trim((string)$url);
+    if ($raw === '' || !preg_match('~^https?://~i', $raw)) return $raw;
+
+    $parts = parse_url($raw);
+    if (!$parts || empty($parts['scheme']) || empty($parts['host'])) {
+        return str_replace(' ', '%20', $raw);
+    }
+
+    $path = $parts['path'] ?? '';
+    $encodedPath = implode('/', array_map(
+        static fn($segment) => rawurlencode(rawurldecode($segment)),
+        explode('/', $path)
+    ));
+
+    $safe = $parts['scheme'] . '://' . $parts['host'];
+    if (isset($parts['port'])) $safe .= ':' . $parts['port'];
+    $safe .= $encodedPath;
+    if (isset($parts['query'])) $safe .= '?' . $parts['query'];
+    if (isset($parts['fragment'])) $safe .= '#' . $parts['fragment'];
+
+    return $safe;
 }
 
 function normalized_phone(string $phone): string

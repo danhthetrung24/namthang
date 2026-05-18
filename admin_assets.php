@@ -16,7 +16,7 @@ foreach ($fields as $key => $_label) {
         header('Location: admin.php?view=media&asset_error=' . rawurlencode('URL không hợp lệ: ' . $key));
         exit;
     }
-    $assets[$key] = $url;
+    $assets[$key] = public_file_url($url);
 }
 
 try {
