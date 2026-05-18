@@ -48,6 +48,41 @@ function admin_status_options(): array
     ];
 }
 
+function admin_landing_asset_fields(): array
+{
+    return [
+        'logoUrl' => 'Logo',
+        'heroBannerImageUrl' => 'Banner chính',
+        'popupPromoImageUrl' => 'Ảnh popup khuyến mãi',
+        'checkinGuideImageUrl' => 'Ảnh hướng dẫn check-in',
+        'whySectionImageUrl' => 'Ảnh lý do chọn',
+        'vehicleDefaultImageUrl' => 'Ảnh xe mặc định',
+        'vehicle16ImageUrl' => 'Ảnh xe 16 chỗ',
+        'vehicle16VideoUrl' => 'Video xe 16 chỗ',
+        'vehicle29ImageUrl' => 'Ảnh xe 29 chỗ',
+        'vehicle29VideoUrl' => 'Video xe 29 chỗ',
+        'vehicleLimoImageUrl' => 'Ảnh xe Limousine',
+        'vehicleLimoVideoUrl' => 'Video xe Limousine',
+        'vehicle45ImageUrl' => 'Ảnh xe 45 chỗ',
+        'vehicle45VideoUrl' => 'Video xe 45 chỗ',
+        'testimonialImage1' => 'Khách hàng 1',
+        'testimonialImage2' => 'Khách hàng 2',
+        'testimonialImage3' => 'Khách hàng 3',
+        'testimonialImage4' => 'Khách hàng 4',
+    ];
+}
+
+function admin_asset_rows_to_map(array $rows): array
+{
+    $map = [];
+    foreach ($rows as $row) {
+        $key = (string)($row['asset_key'] ?? '');
+        if ($key === '') continue;
+        $map[$key] = (string)($row['asset_url'] ?? '');
+    }
+    return $map;
+}
+
 function admin_current_url_query(array $extra = []): string
 {
     $query = array_merge($_GET, $extra);

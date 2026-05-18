@@ -57,6 +57,19 @@ function asset_url(?string $url): string
     return $raw;
 }
 
+function drive_preview_url(?string $url): string
+{
+    $raw = trim((string)$url);
+    if ($raw === '') return '';
+
+    $id = drive_file_id($raw);
+    if ($id !== '') {
+        return 'https://drive.google.com/file/d/' . rawurlencode($id) . '/preview';
+    }
+
+    return $raw;
+}
+
 function normalized_phone(string $phone): string
 {
     $p = preg_replace('/[^0-9+]/', '', $phone) ?? '';

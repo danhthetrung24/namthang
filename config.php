@@ -4,7 +4,7 @@
  * Chỉnh nội dung landing page tại đây.
  */
 
-const APP_VERSION = '2026-05-14 promo-title-two-colors';
+const APP_VERSION = '2026-05-18 vehicle-native-video';
 
 return [
     'brandName' => 'NAM THẮNG TRAVEL BUS',
@@ -28,16 +28,20 @@ return [
         'logoUrl' => 'https://drive.google.com/file/d/1BY20HjqHOdZsMSfTeB4OwpZdUhGiwixe/view',
         'heroBannerImageUrl' => 'https://drive.google.com/file/d/1ST0KnEovyGjIbGAlG8fM46SjyvCDq-O1/view',
         'popupPromoImageUrl' => 'https://drive.google.com/file/d/1xh3UiFhVR8bLpC4TDOxGN12YtMiyi32Z/view', //Xong
-        'checkinGuideImageUrl' => 'https://drive.google.com/file/d/1WfhlfJ7gfBaXYJQcYDSnbuxoHmqkjvAG/view', //Xong
+        'checkinGuideImageUrl' => 'https://drive.google.com/file/d/1KWvaf8y93-Z04Nj1LjSQVp8ohcDoE76P/view', //Xong
         'whySectionImageUrl' => 'https://drive.google.com/file/d/1XbEHbu9oN_klYVeK8o5VHBLRVzOpe7DQ/view',
         'vehicleDefaultImageUrl' => 'https://drive.google.com/file/d/1fTYX673ygi37P2oOtu9ssgqoTHWlKZlY/view',
         'vehicle16ImageUrl' => 'https://drive.google.com/file/d/1fTYX673ygi37P2oOtu9ssgqoTHWlKZlY/view',
         'vehicle29ImageUrl' => 'https://drive.google.com/file/d/1fTYX673ygi37P2oOtu9ssgqoTHWlKZlY/view',
         'vehicleLimoImageUrl' => 'https://drive.google.com/file/d/1fTYX673ygi37P2oOtu9ssgqoTHWlKZlY/view',
         'vehicle45ImageUrl' => 'https://drive.google.com/file/d/1fTYX673ygi37P2oOtu9ssgqoTHWlKZlY/view',
-        'testimonialImage1' => 'https://drive.google.com/file/d/1rYpKBRfyyJaawWCk5YniwFfsaFJ9Nkzu/view',
-        'testimonialImage2' => 'https://drive.google.com/file/d/1-klMwr3FursWIUDBII319aeHBe0HM6sP/view',
-        'testimonialImage3' => 'https://drive.google.com/file/d/1HE7h-AT5JDSxWUKRyT8aYD7jmlDOYyRP/view',
-        'testimonialImage4' => 'https://drive.google.com/file/d/12fAoix5vD3B-uKKTJCF60hObYbqtmT-0/view',
+        'vehicle16VideoUrl' => 'https://drive.google.com/file/d/1cxamku0jUJlTYfW72DEIS-27KU7dtYiG/view',
+        'vehicle29VideoUrl' => 'https://drive.google.com/file/d/1u2UP4ZJlAGPdwBSWQds5CAnR8YCnkLEN/view',
+        'vehicleLimoVideoUrl' => 'https://drive.google.com/file/d/1POxj2zNhWZoj3aQKXfZG5FMSXzTbi0nt/view',
+        'vehicle45VideoUrl' => 'https://drive.google.com/file/d/1p_UtReDEbNCnwMTHDwn3PqU5or7uNsLC/view',
+        'testimonialImage1' => 'https://drive.google.com/file/d/11suk9VA1WwRUv8rGXdvYONrzrnvaInmP/view',
+        'testimonialImage2' => 'https://drive.google.com/file/d/1vBjpywWUavy30dBsSgsqlomeI1_9AAs6/view',
+        'testimonialImage3' => 'https://drive.google.com/file/d/1hFn7RR1syGGkM0TQJOHPNfRetdVCBubR/view',
+        'testimonialImage4' => 'https://drive.google.com/file/d/16OBsMDFEy9xp7kK4uDMAmFCFALEmeF3m/view',
     ],
 ];

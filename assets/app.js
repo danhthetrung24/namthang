@@ -3,6 +3,7 @@ const $ = (id) => document.getElementById(id);
 
 document.addEventListener('DOMContentLoaded', () => {
   bindEvents();
+  bindVehicleVideos();
   setTimeout(() => {
     $('promoModal')?.classList.add('show');
   }, 800);
@@ -37,6 +38,36 @@ function bindEvents() {
   $('pickImagesBtn')?.addEventListener('click', () => $('checkerImages')?.click());
   $('checkerImages')?.addEventListener('change', handleImageSelect);
   $('magicTicketForm')?.addEventListener('submit', submitForm);
+}
+
+function bindVehicleVideos() {
+  document.querySelectorAll('.vehicle-video-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const src = btn.dataset.videoSrc;
+      if (!src) return;
+
+      if (btn.dataset.videoKind === 'file') {
+        const video = document.createElement('video');
+        video.src = src;
+        video.title = btn.dataset.videoTitle || 'Vehicle video';
+        video.controls = true;
+        video.autoplay = true;
+        video.playsInline = true;
+        video.preload = 'metadata';
+        btn.replaceWith(video);
+        video.play().catch(() => {});
+        return;
+      }
+
+      const iframe = document.createElement('iframe');
+      iframe.src = src;
+      iframe.title = btn.dataset.videoTitle || 'Vehicle video';
+      iframe.loading = 'lazy';
+      iframe.allow = 'autoplay; fullscreen';
+      iframe.allowFullscreen = true;
+      btn.replaceWith(iframe);
+    });
+  });
 }
 
 function scrollToForm() {

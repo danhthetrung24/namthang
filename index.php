@@ -1,16 +1,26 @@
 <?php
 require __DIR__ . '/lib/helpers.php';
+require __DIR__ . '/lib/SupabaseClient.php';
 $config = require __DIR__ . '/config.php';
 $assets = $config['assets'] ?? [];
+try {
+    foreach (SupabaseClient::fromEnv()->listLandingAssets() as $assetRow) {
+        $assetKey = (string)($assetRow['asset_key'] ?? '');
+        $assetUrl = trim((string)($assetRow['asset_url'] ?? ''));
+        if ($assetKey !== '' && $assetUrl !== '') $assets[$assetKey] = $assetUrl;
+    }
+} catch (Throwable) {
+    // Keep config.php defaults if Supabase settings are unavailable.
+}
 $footerLinks = $config['footerLinks'] ?? [];
 
 $logo = asset_url($assets['logoUrl'] ?? '');
 
 $vehicles = [
-    ['key' => 'vehicle16ImageUrl', 'title' => 'Xe 16 chỗ', 'items' => ['Phù hợp: gia đình, nhóm nhỏ 10–14 người.', 'Ưu điểm: linh hoạt, dễ di chuyển, chi phí thấp.', 'Tiện nghi: cơ bản, máy lạnh, ghế tiêu chuẩn.', 'Cảm giác: gần gũi, không quá rộn.']],
-    ['key' => 'vehicle29ImageUrl', 'title' => 'Xe 29 chỗ thường', 'items' => ['Phù hợp: nhóm trung bình 15–25 người.', 'Ưu điểm: cân bằng giữa chi phí và sức chứa.', 'Tiện nghi: cơ bản, đủ dùng cho chuyến đi vừa phải.', 'Cảm giác: rộng, thoải mái.']],
-    ['key' => 'vehicleLimoImageUrl', 'title' => 'Xe 29 chỗ Limousine', 'items' => ['Phù hợp: nhóm trung bình 15–25 người.', 'Ưu điểm: ghế VIP, không gian rộng, riêng tư.', 'Tiện nghi: ghế massage, wifi, cổng sạc.', 'Cảm giác: sang trọng như hạng thương gia.']],
-    ['key' => 'vehicle45ImageUrl', 'title' => 'Xe 45 chỗ', 'items' => ['Phù hợp: đoàn lớn, công ty, tour đông người.', 'Ưu điểm: tiết kiệm chi phí theo đầu người.', 'Tiện nghi: tiêu chuẩn, rộng rãi cho đi tập thể.', 'Cảm giác: thoáng, phù hợp lịch trình dài.']],
+    ['key' => 'vehicle16ImageUrl', 'videoKey' => 'vehicle16VideoUrl', 'title' => 'Xe 16 chỗ', 'items' => ['Phù hợp: gia đình, nhóm nhỏ 10–14 người.', 'Ưu điểm: linh hoạt, dễ di chuyển, chi phí thấp.', 'Tiện nghi: cơ bản, máy lạnh, ghế tiêu chuẩn.', 'Cảm giác: gần gũi, không quá rộn.']],
+    ['key' => 'vehicle29ImageUrl', 'videoKey' => 'vehicle29VideoUrl', 'title' => 'Xe 29 tiêu chuẩn', 'items' => ['Phù hợp: nhóm trung bình 15–25 người.', 'Ưu điểm: cân bằng giữa chi phí và sức chứa.', 'Tiện nghi: cơ bản, đủ dùng cho chuyến đi vừa phải.', 'Cảm giác: rộng, thoải mái.']],
+    ['key' => 'vehicleLimoImageUrl', 'videoKey' => 'vehicleLimoVideoUrl', 'title' => 'Xe 29 chỗ Limousine', 'items' => ['Phù hợp: nhóm trung bình 15–25 người.', 'Ưu điểm: ghế VIP, không gian rộng, riêng tư.', 'Tiện nghi: ghế massage, wifi, cổng sạc.', 'Cảm giác: sang trọng như hạng thương gia.']],
+    ['key' => 'vehicle45ImageUrl', 'videoKey' => 'vehicle45VideoUrl', 'title' => 'Xe 45 chỗ', 'items' => ['Phù hợp: đoàn lớn, công ty, tour đông người.', 'Ưu điểm: tiết kiệm chi phí theo đầu người.', 'Tiện nghi: tiêu chuẩn, rộng rãi cho đi tập thể.', 'Cảm giác: thoáng, phù hợp lịch trình dài.']],
 ];
 
 $reviews = [
@@ -51,8 +61,8 @@ $reviews = [
     </a>
 
     <div class="header-actions">
-      <a class="btn btn-secondary" href="<?= e($config['hotlineHref'] ?? 'tel:0923098098') ?>">TƯ VẤN THUÊ XE</a>
-      <button class="btn btn-primary magic-ticket-btn" type="button" data-scroll-form>THAM GIA NHẬN MAGIC TICKET</button>
+      <a class="btn btn-secondary" href="<?= e($config['hotlineHref'] ?? 'tel:0923098098') ?>"><span class="btn-line">TƯ VẤN</span><span class="btn-line">THUÊ XE</span></a>
+      <button class="btn btn-primary magic-ticket-btn" type="button" data-scroll-form><span class="btn-line">THAM GIA NHẬN</span><span class="btn-line">MAGIC TICKET</span></button>
     </div>
   </div>
 </header>
@@ -72,13 +82,26 @@ $reviews = [
   <section class="section" id="dong-xe">
     <div class="container">
       <h2 class="section-title">CÁC DÒNG XE CỦA NAM THẮNG TRAVEL BUS</h2>
-      <p class="section-desc">Tối ưu theo đúng nhu cầu di chuyển: linh hoạt, vừa túi tiền hoặc trải nghiệm cao cấp cho đoàn của bạn.</p>
+      <p class="section-desc">Hệ thống xe đa dạng giúp bạn linh hoạt kế hoạch, tối ưu chi phí và tận hưởng chất lượng dịch vụ cao cấp.</p>
       <div class="vehicle-grid">
         <?php foreach ($vehicles as $vehicle): ?>
           <?php $img = asset_url($assets[$vehicle['key']] ?? $assets['vehicleDefaultImageUrl'] ?? ''); ?>
+          <?php $videoRaw = $assets[$vehicle['videoKey']] ?? ''; ?>
+          <?php $video = drive_preview_url($videoRaw); ?>
+          <?php $isDirectVideo = (bool)preg_match('~\.(mp4|webm|ogg)(\?.*)?$~i', trim((string)$videoRaw)); ?>
+          <?php $poster = $video ? ($img ?: asset_url($videoRaw)) : $img; ?>
           <article class="vehicle-card">
             <div class="vehicle-visual">
-              <?php if ($img): ?>
+              <?php if ($video && $isDirectVideo): ?>
+                <video controls preload="none" playsinline <?php if ($poster): ?>poster="<?= e($poster) ?>"<?php endif; ?>>
+                  <source src="<?= e($video) ?>" type="video/mp4">
+                </video>
+              <?php elseif ($video): ?>
+                <button class="vehicle-video-btn" type="button" data-video-src="<?= e($video) ?>" data-video-kind="<?= $isDirectVideo ? 'file' : 'embed' ?>" data-video-title="<?= e($vehicle['title']) ?>" aria-label="Xem video <?= e($vehicle['title']) ?>">
+                  <?php if ($poster): ?><img src="<?= e($poster) ?>" alt="<?= e($vehicle['title']) ?>" loading="lazy"><?php endif; ?>
+                  <span class="vehicle-play" aria-hidden="true"></span>
+                </button>
+              <?php elseif ($img): ?>
                 <img src="<?= e($img) ?>" alt="<?= e($vehicle['title']) ?>" loading="lazy" onerror="this.parentElement.innerHTML='<span class=&quot;vehicle-icon&quot;>🚌</span>'">
               <?php else: ?>
                 <span class="vehicle-icon">🚌</span>
@@ -173,7 +196,7 @@ $reviews = [
   <section class="section" id="magic-ticket">
     <div class="container checkin-wrap">
       <div class="howto-card">
-        <h2 class="checkin-title">CHECK-IN NGAY – NHẬN MAGIC TICKET LIỀN TAY</h2>
+        <h2 class="checkin-title"><span>CHECKIN NGAY</span><span class="checkin-title-accent">NHẬN MAGIC TICKET LIỀN TAY</span></h2>
         <?php $guide = asset_url($assets['checkinGuideImageUrl'] ?? ''); ?>
         <?php if ($guide): ?><img class="guide-img" src="<?= e($guide) ?>" alt="Thể lệ tham gia" loading="lazy"><?php endif; ?>
         <div class="step"><b>1</b><span>Chụp ảnh hoặc quay video sáng tạo cùng xe Nam Thắng Travel Bus.</span></div>
@@ -183,7 +206,7 @@ $reviews = [
           <strong>Lưu ý:</strong>
           <ul>
             <li>Voucher sẽ tự động gửi vào phần Ưu Đãi trên App Taxi Nam Thắng sau 24h.</li>
-            <li>Ảnh check-in: nhận Voucher Magic Ticket 300K</li>
+            <li>Ảnh checkin: nhận Voucher Magic Ticket 300K</li>
             <li>Video review: nhận Voucher Magic Ticket 600K</li>
             <li>Voucher áp dụng toàn bộ hệ thống Taxi điện Nam Thắng tại các tỉnh Miền Tây.</li>
             <li>Nếu chưa có ứng dụng, bạn vui lòng Tải App Taxi Nam Thắng <a href="<?= e($config['iosLink'] ?? $config['androidLink'] ?? '#') ?>" target="_blank" rel="noopener noreferrer">tại đây</a>.</li>
@@ -193,11 +216,11 @@ $reviews = [
 
       <div class="form-card" id="magicTicketFormCard">
         <h2>Điền thông tin nhận Magic Ticket</h2>
-        <p>Gửi đúng link check-in công khai và ảnh màn hình để đội ngũ xác minh nhanh hơn.</p>
+        <p>Gửi đúng link checkin công khai và ảnh màn hình để đội ngũ xác minh nhanh hơn.</p>
         <form id="magicTicketForm" novalidate>
           <label>Số điện thoại <span>*</span><input id="soDienThoai" name="soDienThoai" type="tel" maxlength="20" required placeholder="Nhập số điện thoại"></label>
           <label>Họ tên <span>*</span><input id="hoTen" name="hoTen" type="text" maxlength="100" required placeholder="Nhập họ tên"></label>
-          <label>Dán link check-in <span>*</span><textarea id="linkCheckIn" name="linkCheckIn" required placeholder="Dán link bài đăng Facebook hoặc TikTok công khai"></textarea></label>
+          <label>Dán link checkin <span>*</span><textarea id="linkCheckIn" name="linkCheckIn" required placeholder="Dán link bài đăng Facebook hoặc TikTok công khai"></textarea></label>
           <div class="upload-box">
             <div><strong>Ảnh màn hình check-in</strong><small>Có thể chọn nhiều ảnh, tối đa 10 ảnh. Ảnh được nén trước khi gửi.</small></div>
             <button id="pickImagesBtn" type="button" class="pick-btn">Chọn ảnh</button>
@@ -230,10 +253,49 @@ $reviews = [
   <section class="section" id="faq">
     <div class="container faq-list">
       <h2 class="section-title">Câu hỏi thường gặp khi đặt xe</h2>
-      <details open><summary>Đặt cọc, thuê xe như thế nào và nếu lịch trình thay đổi đột ngột ra sao?</summary><p>Khách hàng liên hệ hotline hoặc Zalo để được tư vấn xe, lịch trình và chi phí. Đội ngũ Nam Thắng sẽ hỗ trợ điều chỉnh khi lịch trình phát sinh thay đổi.</p></details>
-      <details><summary>Giá thuê xe đã bao gồm tất cả các chi phí như xăng dầu, phí cầu đường, cao tốc và tiền tip cho tài xế chưa?</summary><p>Chi phí sẽ được tư vấn rõ theo từng lịch trình. Các khoản bao gồm hoặc phát sinh như xăng dầu, phí cầu đường, cao tốc và tip tài xế sẽ được xác nhận trước khi đặt xe.</p></details>
-      <details><summary>Xe Nam Thắng là dòng xe đời nào, có đầy đủ tiện nghi không?</summary><p>Nam Thắng sử dụng các dòng xe đời mới, sạch sẽ, ghế ngồi thoải mái, máy lạnh và các tiện ích phù hợp cho hành trình gia đình, nhóm bạn hoặc đoàn du lịch.</p></details>
-      <details><summary>Tài xế có rành đường không và phục vụ đoàn như thế nào?</summary><p>Tài xế có kinh nghiệm đường dài, hỗ trợ lịch trình linh hoạt, lái xe an toàn và đồng hành cùng đoàn trong suốt chuyến đi.</p></details>
+      <details open>
+        <summary>Nam Thắng Travel Bus có những dòng xe nào và đời xe năm bao nhiêu?</summary>
+        <p>Nam Thắng Travel Bus đầu tư xe mới 100% vào đầu năm 2026 với đầy đủ các dòng xe chuyên hiện phục vụ tour du lịch, công tác, đám tiệc, sự kiện như sau:</p>
+        <ul>
+          <li><strong>Xe Limousine 29 ghế VIP:</strong> Xe KimLong 29 ghế thương gia với ghế chỉnh điện, nâng hạ đùi, bàn làm việc, sạc điện thoại, karaoke chuyên nghiệp.</li>
+          <li><strong>Xe 16 chỗ:</strong> Xe Ford Transit 18 chỗ nâng cấp còn 16 chỗ ngồi rộng rãi, thoải mái và ổn định nhờ hệ thống bánh đôi sau xe.</li>
+          <li><strong>Xe 29 chỗ:</strong> Tracomeco.</li>
+          <li><strong>Xe 45 chỗ:</strong> KimLong.</li>
+          <li><strong>Xe du lịch cao cấp theo đoàn.</strong></li>
+        </ul>
+      </details>
+      <details>
+        <summary>Giá thuê xe đã bao gồm những chi phí gì? Có phát sinh thêm không?</summary>
+        <p>Thông thường báo giá đã bao gồm: tài xế, nhiên liệu và phí cầu đường cơ bản. Một số chi phí phát sinh nếu có sẽ được thông báo trước rõ ràng.</p>
+        <p>Có xuất hóa đơn VAT đầy đủ cho cá nhân và doanh nghiệp.</p>
+      </details>
+      <details>
+        <summary>Nhà xe có hỗ trợ đón trả tận nơi và đi liên tỉnh không?</summary>
+        <p>Có. Chúng tôi nhận phục vụ đa dạng nhu cầu: từ tour du lịch liên tỉnh, đưa đón sân bay, đến xe hợp đồng dài ngày cho doanh nghiệp hoặc đám cưới - sự kiện.</p>
+        <p>Nam Thắng hỗ trợ đón/trả tận nơi theo yêu cầu tại An Giang, Cần Thơ và khắp các tỉnh Miền Tây.</p>
+      </details>
+      <details>
+        <summary>Tại sao tôi nên tin tưởng và lựa chọn dịch vụ của Nam Thắng?</summary>
+        <p>Nam Thắng Travel Bus là một phần trong hệ sinh thái vững mạnh của Tập đoàn Nam Thắng rộng khắp miền Tây.</p>
+        <ul>
+          <li>Xe đời mới, sạch đẹp.</li>
+          <li>Tài xế chuyên nghiệp.</li>
+          <li>Phục vụ đúng giờ.</li>
+          <li>Hỗ trợ nhiệt tình.</li>
+          <li>Giá hợp lý.</li>
+          <li>Chuyên tour đoàn và du lịch.</li>
+        </ul>
+      </details>
+      <details>
+        <summary>Quy trình đặt xe như thế nào và có ưu đãi cho đoàn lớn không?</summary>
+        <p>Khách hàng có thể đặt xe qua:</p>
+        <ul>
+          <li><strong>Hotline:</strong> 0923 098 098 (Zalo).</li>
+          <li><strong>Nhân sự phụ trách:</strong> Mr Sĩ 0918 722 944.</li>
+          <li><strong>Facebook:</strong> Nam Thắng Travel Bus.</li>
+        </ul>
+        <p>Nhà xe thường có giá ưu đãi cho đoàn, hỗ trợ lịch trình và chính sách dành cho khách hàng thân thiết.</p>
+      </details>
     </div>
   </section>
 </main>

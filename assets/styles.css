@@ -14,7 +14,7 @@
   --accent-dark:#c90f17;
   --text:#26391a;
   --muted:#607059;
-  --bg:#eef9f7;
+  --bg:#f1fff0;
   --card:#ffffff;
   --line:rgba(104,159,56,.24);
   --shadow:0 18px 42px rgba(31,45,26,.12);
@@ -39,7 +39,7 @@ body{
   font-family:var(--font);
   font-weight:600;
   color:var(--text);
-  background:linear-gradient(180deg,#eaf8ff 0%,#f1fff0 46%,#f8fff3 100%);
+  background:var(--bg);
   overflow-x:hidden;
 }
 
@@ -191,6 +191,19 @@ textarea{
   filter:brightness(.96);
 }
 
+.header-actions .btn-line{
+  position:relative;
+  z-index:1;
+}
+
+.header-actions .btn-line + .btn-line::before{
+  content:none;
+}
+
+.header-actions .btn{
+  gap:5px;
+}
+
 /* =========================
    Hero
    ========================= */
@@ -241,7 +254,8 @@ textarea{
 }
 
 .vehicle-visual{
-  height:150px;
+  aspect-ratio:16/9;
+  width:100%;
   border-radius:20px;
   margin-bottom:16px;
   background:linear-gradient(135deg,#d8f2bd,#71bd35);
@@ -254,8 +268,63 @@ textarea{
 .vehicle-visual img{
   width:100%;
   height:100%;
-  object-fit:contain;
-  padding:8px;
+  object-fit:cover;
+}
+
+.vehicle-visual iframe,
+.vehicle-visual video{
+  width:100%;
+  height:100%;
+  border:0;
+  display:block;
+  background:#000;
+}
+
+.vehicle-visual video{
+  object-fit:cover;
+}
+
+.vehicle-video-btn{
+  position:relative;
+  width:100%;
+  height:100%;
+  border:0;
+  padding:0;
+  display:block;
+  overflow:hidden;
+  background:#000;
+  cursor:pointer;
+}
+
+.vehicle-video-btn img{
+  transition:transform .22s ease,filter .22s ease;
+}
+
+.vehicle-video-btn:hover img{
+  transform:scale(1.035);
+  filter:brightness(.92);
+}
+
+.vehicle-play{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  background:rgba(0,0,0,.72);
+  box-shadow:0 10px 24px rgba(0,0,0,.24);
+  transform:translate(-50%,-50%);
+}
+
+.vehicle-play:before{
+  content:'';
+  position:absolute;
+  left:21px;
+  top:15px;
+  border-top:11px solid transparent;
+  border-bottom:11px solid transparent;
+  border-left:16px solid #fff;
 }
 
 .vehicle-icon{
@@ -306,7 +375,7 @@ textarea{
 }
 
 #tai-sao-chon{
-  background:#fff;
+  background:var(--bg);
 }
 
 .why-custom-card{
@@ -314,7 +383,7 @@ textarea{
   max-width:650px;
   margin:0 auto;
   padding:0 42px 10px;
-  background:#fff;
+  background:transparent;
   color:#8bc63f;
 }
 
@@ -478,7 +547,11 @@ textarea{
 }
 
 .howto-card .checkin-title{
-  display:inline-block;
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
   color:#00a651;
   -webkit-text-stroke:1.25px #006f37;
   paint-order:stroke fill;
@@ -486,6 +559,16 @@ textarea{
   transform-origin:center;
   will-change:transform;
   animation:checkinTitleShake 2.2s ease-in-out infinite;
+}
+
+.howto-card .checkin-title span{
+  display:block;
+}
+
+.howto-card .checkin-title-accent{
+  color:#f4df24;
+  -webkit-text-stroke:1.45px #006f37;
+  text-shadow:0 2px 0 rgba(0,91,42,.42),0 0 10px rgba(244,223,36,.18);
 }
 
 @keyframes checkinTitleShake{
@@ -675,6 +758,8 @@ textarea{
 .submit-btn{
   width:100%;
   min-height:52px;
+  background:#ff9900!important;
+  box-shadow:0 12px 26px rgba(255,153,0,.26);
 }
 
 .privacy-note{
@@ -744,9 +829,22 @@ textarea{
 }
 
 .faq-list p{
+  margin:12px 0 0;
   color:var(--muted);
   line-height:1.72;
   font-weight:700;
+}
+
+.faq-list ul{
+  margin:10px 0 0;
+  padding-left:22px;
+  color:var(--muted);
+  line-height:1.72;
+  font-weight:700;
+}
+
+.faq-list li{
+  margin:4px 0;
 }
 
 /* =========================
@@ -754,19 +852,18 @@ textarea{
    ========================= */
 
 .footer{
-  padding:12px 0 48px;
+  padding:42px 0 46px;
   background:linear-gradient(180deg,#9bd64b 0%,#7fbe3c 100%);
   color:#fff;
-  text-align:center;
+  text-align:left;
 }
 
 .footer-inner{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:26px;
-  max-width:430px;
+  display:grid;
+  grid-template-columns:1.15fr 1.55fr .95fr .95fr;
+  align-items:start;
+  gap:34px;
+  max-width:1120px;
 }
 
 .footer-main,
@@ -775,15 +872,15 @@ textarea{
 .footer-social{
   display:flex;
   flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
+  align-items:flex-start;
+  justify-content:flex-start;
+  text-align:left;
 }
 
 .footer-brand-name{
   margin:12px 0 0;
   font-family:var(--display);
-  font-size:21px;
+  font-size:24px;
   line-height:1.2;
   font-weight:900;
   color:#fff;
@@ -795,7 +892,7 @@ textarea{
 .footer-tagline{
   margin:0;
   color:#fff;
-  font-size:16px;
+  font-size:17px;
   font-weight:900;
   font-style:italic;
   line-height:1.2;
@@ -803,8 +900,8 @@ textarea{
 }
 
 .footer-logo-wrap{
-  width:74px;
-  height:46px;
+  width:86px;
+  height:54px;
   border-radius:6px;
   background:#fff;
   display:flex;
@@ -832,7 +929,7 @@ textarea{
 .footer-social h4{
   margin:0 0 8px;
   font-family:var(--display);
-  font-size:17px;
+  font-size:19px;
   line-height:1.2;
   font-weight:900;
   color:#fff;
@@ -844,21 +941,21 @@ textarea{
 .footer-contact p{
   margin:0;
   color:#fff;
-  font-size:15px;
+  font-size:16px;
   line-height:1.45;
   font-weight:900;
   text-shadow:0 1px 1px rgba(74,122,26,.24);
 }
 
 .footer-company p{
-  max-width:390px;
+  max-width:460px;
 }
 
 .footer-social-list{
   display:flex;
   align-items:center;
-  justify-content:center;
-  gap:34px;
+  justify-content:flex-start;
+  gap:20px;
   flex-wrap:wrap;
 }
 
@@ -878,8 +975,8 @@ textarea{
 }
 
 .footer-social-icon{
-  width:48px;
-  height:48px;
+  width:42px;
+  height:42px;
   border-radius:50%;
   display:flex;
   align-items:center;
@@ -888,8 +985,8 @@ textarea{
 }
 
 .footer-social-icon svg{
-  width:48px;
-  height:48px;
+  width:42px;
+  height:42px;
   display:block;
   fill:#fff;
 }
@@ -1431,15 +1528,29 @@ textarea{
     flex:1;
     min-width:0;
     width:auto;
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
     gap:7px;
   }
 
   .header-actions .btn{
-    min-height:38px;
-    padding:7px 6px;
+    min-width:0;
+    min-height:42px;
+    padding:7px 8px;
+    flex-direction:column;
+    gap:0;
     font-size:10px;
-    line-height:1.12;
+    line-height:1.08;
+    white-space:normal;
+    overflow-wrap:normal;
+    word-break:normal;
+  }
+
+  .header-actions .btn-line{
+    display:block;
+  }
+
+  .header-actions .btn-line + .btn-line::before{
+    content:none;
   }
 
   .hero{
@@ -1462,7 +1573,7 @@ textarea{
   }
 
   .vehicle-visual{
-    height:190px;
+    aspect-ratio:16/9;
   }
 
   .vehicle-card h3{
@@ -1553,10 +1664,25 @@ textarea{
 
   .footer{
     padding:10px 0 44px;
+    text-align:center;
   }
 
   .footer-inner{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
     gap:24px;
+    max-width:430px;
+  }
+
+  .footer-main,
+  .footer-company,
+  .footer-contact,
+  .footer-social{
+    align-items:center;
+    justify-content:center;
+    text-align:center;
   }
 
   .footer-brand-name{
@@ -1696,9 +1822,9 @@ textarea{
   }
 
   .header-actions .btn{
-    min-height:38px;
-    padding:7px 5px;
-    font-size:9.4px;
+    min-height:40px;
+    padding:6px 6px;
+    font-size:9.6px;
   }
 
   .float-btn{

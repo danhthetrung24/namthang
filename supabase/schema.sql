@@ -20,11 +20,23 @@ create index if not exists idx_magic_ticket_phone on public.magic_ticket_registr
 
 alter table public.magic_ticket_registrations enable row level security;
 
+create table if not exists public.landing_page_assets (
+  asset_key text primary key,
+  asset_url text not null default '',
+  updated_at timestamptz not null default now()
+);
+
+alter table public.landing_page_assets enable row level security;
+
 -- Nếu dùng PHP với SERVICE_ROLE_KEY thì RLS vẫn an toàn, service role bypass RLS.
 -- Policy dưới đây chỉ cần khi bạn muốn đọc dữ liệu bằng anon key, mặc định không bật select public.
 
 insert into storage.buckets (id, name, public)
 values ('magic-ticket-images', 'magic-ticket-images', true)
+on conflict (id) do update set public = true;
+
+insert into storage.buckets (id, name, public)
+values ('landing-assets', 'landing-assets', true)
 on conflict (id) do update set public = true;
 
 -- Chỉ cần public read cho ảnh đã upload để đội vận hành mở link_anh.
@@ -34,3 +46,10 @@ on storage.objects
 for select
 to anon
 using (bucket_id = 'magic-ticket-images');
+
+drop policy if exists "public_read_landing_assets" on storage.objects;
+create policy "public_read_landing_assets"
+on storage.objects
+for select
+to anon
+using (bucket_id = 'landing-assets');

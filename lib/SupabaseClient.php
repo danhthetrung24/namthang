@@ -95,6 +95,34 @@ final class SupabaseClient
         );
     }
 
+    public function listLandingAssets(): array
+    {
+        return $this->request('GET', '/rest/v1/landing_page_assets?select=asset_key,asset_url&order=asset_key.asc');
+    }
+
+    public function upsertLandingAssets(array $assets): array
+    {
+        $rows = [];
+        foreach ($assets as $key => $url) {
+            $rows[] = [
+                'asset_key' => (string)$key,
+                'asset_url' => trim((string)$url),
+                'updated_at' => gmdate('c'),
+            ];
+        }
+
+        if (!$rows) return [];
+
+        return $this->request(
+            'POST',
+            '/rest/v1/landing_page_assets?on_conflict=asset_key',
+            $rows,
+            [
+                'Prefer: resolution=merge-duplicates,return=representation',
+            ]
+        );
+    }
+
     public function uploadObject(string $bucket, string $path, string $bytes, string $contentType): array
     {
         $endpoint = '/storage/v1/object/' . rawurlencode($bucket) . '/' . str_replace('%2F', '/', rawurlencode($path));
