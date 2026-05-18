@@ -95,6 +95,20 @@ function public_file_url(?string $url): string
     return $safe;
 }
 
+function media_proxy_url(?string $url): string
+{
+    $safe = public_file_url($url);
+    if ($safe === '') return '';
+
+    $host = parse_url($safe, PHP_URL_HOST) ?: '';
+    $path = parse_url($safe, PHP_URL_PATH) ?: '';
+    if (str_ends_with($host, 'supabase.co') && str_contains($path, '/storage/v1/object/public/landing-assets/')) {
+        return 'media.php?src=' . rawurlencode(base64_encode($safe));
+    }
+
+    return $safe;
+}
+
 function normalized_phone(string $phone): string
 {
     $p = preg_replace('/[^0-9+]/', '', $phone) ?? '';

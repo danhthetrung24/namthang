@@ -88,13 +88,14 @@ $reviews = [
           <?php $img = asset_url($assets[$vehicle['key']] ?? $assets['vehicleDefaultImageUrl'] ?? ''); ?>
           <?php $videoRaw = $assets[$vehicle['videoKey']] ?? ''; ?>
           <?php $video = drive_preview_url($videoRaw); ?>
+          <?php $videoSrc = media_proxy_url($video); ?>
           <?php $isDirectVideo = (bool)preg_match('~\.(mp4|webm|ogg)(\?.*)?$~i', trim((string)$videoRaw)); ?>
           <?php $poster = $video ? ($img ?: asset_url($videoRaw)) : $img; ?>
           <article class="vehicle-card">
             <div class="vehicle-visual">
               <?php if ($video && $isDirectVideo): ?>
                 <video controls preload="none" playsinline <?php if ($poster): ?>poster="<?= e($poster) ?>"<?php endif; ?>>
-                  <source src="<?= e($video) ?>" type="video/mp4">
+                  <source src="<?= e($videoSrc) ?>" type="video/mp4">
                 </video>
               <?php elseif ($video): ?>
                 <button class="vehicle-video-btn" type="button" data-video-src="<?= e($video) ?>" data-video-kind="<?= $isDirectVideo ? 'file' : 'embed' ?>" data-video-title="<?= e($vehicle['title']) ?>" aria-label="Xem video <?= e($vehicle['title']) ?>">

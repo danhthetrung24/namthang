@@ -4,7 +4,7 @@
  * Chỉnh nội dung landing page tại đây.
  */
 
-const APP_VERSION = '2026-05-18 mobile-video-url';
+const APP_VERSION = '2026-05-18 same-origin-video';
 
 return [
     'brandName' => 'NAM THẮNG TRAVEL BUS',
