@@ -1018,6 +1018,7 @@ textarea{
 }
 
 .float-btn{
+  position:relative;
   pointer-events:auto;
   width:56px;
   height:56px;
@@ -1029,12 +1030,23 @@ textarea{
   align-items:center;
   justify-content:center;
   overflow:hidden;
+  animation:floatHeartbeat 1.15s ease-in-out infinite;
+  transform-origin:center;
   transition:transform .18s ease,box-shadow .18s ease;
+}
+
+.float-btn.messenger{
+  animation-delay:.18s;
+}
+
+.float-btn.hotline{
+  animation-delay:.36s;
 }
 
 .float-btn:hover{
   transform:translateY(-2px) scale(1.04);
   box-shadow:0 14px 30px rgba(0,0,0,.24);
+  animation-play-state:paused;
 }
 
 .float-btn:active{
@@ -1069,6 +1081,34 @@ textarea{
   font-size:28px;
   line-height:1;
   transform:rotate(-12deg);
+}
+
+@keyframes floatHeartbeat{
+  0%,
+  100%{
+    transform:scale(1);
+    box-shadow:0 10px 24px rgba(0,0,0,.20),0 0 0 0 rgba(23,133,31,.32);
+  }
+
+  12%{
+    transform:scale(1.22);
+    box-shadow:0 16px 34px rgba(0,0,0,.26),0 0 0 9px rgba(23,133,31,.18);
+  }
+
+  24%{
+    transform:scale(.92);
+    box-shadow:0 8px 20px rgba(0,0,0,.18),0 0 0 3px rgba(23,133,31,.10);
+  }
+
+  36%{
+    transform:scale(1.16);
+    box-shadow:0 14px 30px rgba(0,0,0,.24),0 0 0 12px rgba(237,17,27,.14);
+  }
+
+  52%{
+    transform:scale(1);
+    box-shadow:0 10px 24px rgba(0,0,0,.20),0 0 0 18px rgba(23,133,31,0);
+  }
 }
 
 /* =========================
@@ -1543,7 +1583,7 @@ textarea{
     padding:7px 8px;
     flex-direction:column;
     gap:0;
-    font-size:10px;
+    font-size:11.5px;
     line-height:1.08;
     white-space:normal;
     overflow-wrap:normal;
@@ -1830,7 +1870,7 @@ textarea{
   .header-actions .btn{
     min-height:40px;
     padding:6px 6px;
-    font-size:9.6px;
+    font-size:10.8px;
   }
 
   .float-btn{
