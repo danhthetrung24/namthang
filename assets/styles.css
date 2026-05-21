@@ -403,34 +403,16 @@ textarea{
   font-weight:900;
   text-align:center;
   text-transform:uppercase;
-  -webkit-text-stroke:2.4px #087a39;
+  -webkit-text-stroke:1.6px #087a39;
   paint-order:stroke fill;
-  text-shadow:
-    2px 0 0 #087a39,
-    -2px 0 0 #087a39,
-    0 2px 0 #087a39,
-    0 -2px 0 #087a39,
-    1.5px 1.5px 0 #087a39,
-    -1.5px 1.5px 0 #087a39,
-    1.5px -1.5px 0 #087a39,
-    -1.5px -1.5px 0 #087a39,
-    0 3px 0 rgba(0,83,40,.36);
+  text-shadow:0 2px 0 #087a39;
 }
 
 .why-custom-card h2 span{
   color:#ffe83a;
-  -webkit-text-stroke:2.4px #087a39;
+  -webkit-text-stroke:1.6px #087a39;
   paint-order:stroke fill;
-  text-shadow:
-    2px 0 0 #087a39,
-    -2px 0 0 #087a39,
-    0 2px 0 #087a39,
-    0 -2px 0 #087a39,
-    1.5px 1.5px 0 #087a39,
-    -1.5px 1.5px 0 #087a39,
-    1.5px -1.5px 0 #087a39,
-    -1.5px -1.5px 0 #087a39,
-    0 3px 0 rgba(0,83,40,.36);
+  text-shadow:0 2px 0 #087a39;
 }
 
 .why-feature-list{
@@ -1631,7 +1613,11 @@ textarea{
     padding:8px 10px 7px;
     font-size:18px;
     border-radius:7px;
-    -webkit-text-stroke:1.8px #087a39;
+    -webkit-text-stroke:1.25px #087a39;
+  }
+
+  .why-custom-card h2 span{
+    -webkit-text-stroke:1.25px #087a39;
   }
 
   .why-feature,
