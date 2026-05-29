@@ -207,8 +207,8 @@ $reviews = [
           <strong>Lưu ý:</strong>
           <ul>
             <li><span>1</span><p>Voucher sẽ tự động gửi vào phần Ưu Đãi trên App Taxi Nam Thắng sau 24h.</p></li>
-            <li class="note-bullet"><span></span><p>Ảnh checkin: nhận Voucher Magic Ticket 300K.</p></li>
-            <li class="note-bullet"><span></span><p>Video review: nhận Voucher Magic Ticket 600K.</p></li>
+            <li class="note-bullet"><span>-</span><p>Ảnh checkin: nhận Voucher Magic Ticket 300K.</p></li>
+            <li class="note-bullet"><span>-</span><p>Video review: nhận Voucher Magic Ticket 600K.</p></li>
             <li><span>2</span><p>Ảnh và video gửi về sẽ được đăng lại trên trang Nam Thắng Travel Bus.</p></li>
             <li><span>3</span><p>Voucher áp dụng toàn bộ hệ thống Taxi điện Nam Thắng tại các tỉnh Miền Tây.</p></li>
             <li><span>4</span><p>Nếu chưa có ứng dụng, bạn vui lòng Tải App Taxi Nam Thắng <a href="<?= e($config['iosLink'] ?? $config['androidLink'] ?? '#') ?>" target="_blank" rel="noopener noreferrer">tại đây</a>.</p></li>

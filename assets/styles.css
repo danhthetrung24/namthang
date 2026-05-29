@@ -645,10 +645,14 @@ textarea{
 }
 
 .note-box li.note-bullet span{
-  width:8px;
-  height:8px;
-  margin:8px 0 0 8px;
-  background:#7a4b22;
+  width:24px;
+  height:24px;
+  margin:0;
+  border-radius:0;
+  background:transparent;
+  color:#7a4b22;
+  font-size:18px;
+  line-height:1;
 }
 
 .note-box li p{
