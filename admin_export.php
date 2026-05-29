@@ -38,11 +38,11 @@ echo "\xEF\xBB\xBF";
       <th>Thời gian</th>
       <th>Họ tên</th>
       <th>Số điện thoại</th>
-      <th>Link check-in</th>
+      <th>Link checkin</th>
       <th>Nền tảng</th>
-      <th>Số ảnh</th>
-      <th>Link ảnh</th>
-      <th>Tên file ảnh</th>
+      <th>Số file</th>
+      <th>Link file</th>
+      <th>Tên file</th>
       <th>Trạng thái</th>
       <th>ID</th>
       <th>User Agent</th>
@@ -64,7 +64,7 @@ echo "\xEF\xBB\xBF";
       <td><?= e((string)($row['so_anh'] ?? count($links))) ?></td>
       <td>
         <?php foreach ($links as $i => $url): ?>
-          <a href="<?= e($url) ?>">Ảnh <?= $i + 1 ?></a><?= $i < count($links) - 1 ? '<br>' : '' ?>
+          <a href="<?= e($url) ?>">File <?= $i + 1 ?></a><?= $i < count($links) - 1 ? '<br>' : '' ?>
         <?php endforeach; ?>
       </td>
       <td><?= e(implode("\n", $names)) ?></td>

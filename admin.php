@@ -41,6 +41,12 @@ if ($view === 'media' && isset($supabase)) {
 }
 
 $exportQuery = admin_current_url_query(['page' => null]);
+
+function admin_is_video_url(string $url): bool
+{
+    $path = parse_url($url, PHP_URL_PATH) ?: '';
+    return (bool)preg_match('/\.(mp4|mov|webm|avi|m4v)$/i', $path);
+}
 ?>
 <!doctype html>
 <html lang="vi">
@@ -81,7 +87,7 @@ $exportQuery = admin_current_url_query(['page' => null]);
     <input type="hidden" name="view" value="registrations">
     <div class="field">
       <label>Tìm kiếm</label>
-      <input name="q" value="<?= e($filters['q']) ?>" placeholder="Tên, số điện thoại hoặc link check-in">
+      <input name="q" value="<?= e($filters['q']) ?>" placeholder="Tên, số điện thoại hoặc link checkin">
     </div>
     <div class="field">
       <label>Trạng thái</label>
@@ -149,8 +155,8 @@ $exportQuery = admin_current_url_query(['page' => null]);
             <th>Thời gian</th>
             <th>Khách hàng</th>
             <th>Số điện thoại</th>
-            <th>Check-in</th>
-            <th>Ảnh</th>
+            <th>Checkin</th>
+            <th>File checkin</th>
             <th>Nền tảng</th>
             <th>Trạng thái</th>
             <th>ID</th>
@@ -166,19 +172,29 @@ $exportQuery = admin_current_url_query(['page' => null]);
             <td class="nowrap"><?= e(admin_format_date($row['created_at'] ?? '')) ?></td>
             <td><strong><?= e($row['ho_ten'] ?? '') ?></strong></td>
             <td class="phone"><?= e($row['so_dien_thoai'] ?? '') ?></td>
-            <td class="link-cell"><a href="<?= e($row['link_checkin'] ?? '#') ?>" target="_blank" rel="noopener">Mở link</a></td>
+            <td class="link-cell">
+              <?php if (!empty($row['link_checkin'])): ?>
+                <a href="<?= e($row['link_checkin']) ?>" target="_blank" rel="noopener">Mở link</a>
+              <?php else: ?>
+                <span class="small">Không có link</span>
+              <?php endif; ?>
+            </td>
             <td>
               <?php if ($links): ?>
                 <div class="images">
                   <?php foreach ($links as $i => $url): ?>
-                    <a href="<?= e($url) ?>" target="_blank" rel="noopener" title="Mở ảnh <?= $i + 1 ?>">
-                      <img class="thumb" src="<?= e($url) ?>" alt="Ảnh <?= $i + 1 ?>" loading="lazy">
+                    <a href="<?= e($url) ?>" target="_blank" rel="noopener" title="Mở file <?= $i + 1 ?>">
+                      <?php if (admin_is_video_url((string)$url)): ?>
+                        <video class="thumb" src="<?= e($url) ?>" muted playsinline preload="metadata"></video>
+                      <?php else: ?>
+                        <img class="thumb" src="<?= e($url) ?>" alt="File <?= $i + 1 ?>" loading="lazy">
+                      <?php endif; ?>
                     </a>
                   <?php endforeach; ?>
                 </div>
-                <div class="small"><?= count($links) ?> ảnh</div>
+                <div class="small"><?= count($links) ?> file</div>
               <?php else: ?>
-                <span class="small">Không có ảnh</span>
+                <span class="small">Không có file</span>
               <?php endif; ?>
             </td>
             <td><?= e($row['platform'] ?? '') ?></td>

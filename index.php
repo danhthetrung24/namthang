@@ -201,7 +201,7 @@ $reviews = [
         <?php $guide = asset_url($assets['checkinGuideImageUrl'] ?? ''); ?>
         <?php if ($guide): ?><img class="guide-img" src="<?= e($guide) ?>" alt="Thể lệ tham gia" loading="lazy"><?php endif; ?>
         <div class="step"><b>1</b><span>Chụp ảnh hoặc quay video sáng tạo cùng xe Nam Thắng Travel Bus.</span></div>
-        <div class="step"><b>2</b><span>Đăng công khai Facebook hoặc TikTok kèm hashtag:<br><strong>#NamThangTravelBus #TaxiNamThang #ChuyenXeThanhThoi #XeXinMienTay #SongAoTrenXe</strong></span></div>
+        <div class="step"><b>2</b><span>Đăng bài checkin HOẶC Gửi ảnh checkin cho Nam Thắng Travel Bus<br><strong>#NamThangTravelBus #TaxiNamThang #ChuyenXeThanhThoi #XeXinMienTay #SongAoTrenXe</strong></span></div>
         <div class="step"><b>3</b><span>Điền thông tin bên cạnh và nhấn <strong>NHẬN MAGIC TICKET</strong>.</span></div>
         <div class="note-box">
           <strong>Lưu ý:</strong>
@@ -209,6 +209,7 @@ $reviews = [
             <li>Voucher sẽ tự động gửi vào phần Ưu Đãi trên App Taxi Nam Thắng sau 24h.</li>
             <li>Ảnh checkin: nhận Voucher Magic Ticket 300K</li>
             <li>Video review: nhận Voucher Magic Ticket 600K</li>
+            <li>Ảnh và video gửi về sẽ được đăng lại trên trang Nam Thắng Travel Bus.</li>
             <li>Voucher áp dụng toàn bộ hệ thống Taxi điện Nam Thắng tại các tỉnh Miền Tây.</li>
             <li>Nếu chưa có ứng dụng, bạn vui lòng Tải App Taxi Nam Thắng <a href="<?= e($config['iosLink'] ?? $config['androidLink'] ?? '#') ?>" target="_blank" rel="noopener noreferrer">tại đây</a>.</li>
           </ul>
@@ -217,17 +218,23 @@ $reviews = [
 
       <div class="form-card" id="magicTicketFormCard">
         <h2>Điền thông tin nhận Magic Ticket</h2>
-        <p>Gửi đúng link checkin công khai và ảnh màn hình để đội ngũ xác minh nhanh hơn.</p>
+        <p>Gửi link bài viết checkin hoặc tải trực tiếp ảnh/video để đội ngũ xác minh nhanh hơn.</p>
         <form id="magicTicketForm" novalidate>
           <label>Số điện thoại <span>*</span><input id="soDienThoai" name="soDienThoai" type="tel" maxlength="20" required placeholder="Nhập số điện thoại"></label>
           <label>Họ tên <span>*</span><input id="hoTen" name="hoTen" type="text" maxlength="100" required placeholder="Nhập họ tên"></label>
-          <label>Dán link checkin <span>*</span><textarea id="linkCheckIn" name="linkCheckIn" required placeholder="Dán link bài đăng Facebook hoặc TikTok công khai"></textarea></label>
+          <label>Link bài viết checkin (Nếu có)<textarea id="linkCheckIn" name="linkCheckIn" placeholder="Dán link bài đăng Facebook hoặc TikTok công khai"></textarea></label>
           <div class="upload-box">
-            <div><strong>Ảnh màn hình check-in</strong><small>Có thể chọn nhiều ảnh, tối đa 10 ảnh. Ảnh được nén trước khi gửi.</small></div>
-            <button id="pickImagesBtn" type="button" class="pick-btn">Chọn ảnh</button>
-            <input id="checkerImages" type="file" accept="image/*" multiple hidden>
+            <div>
+              <strong>Tải lên ảnh/video checkin trực tiếp</strong>
+              <small>
+                - Link bài viết checkin (Nếu có)<br>
+                - Tải lên ảnh/video checkin trực tiếp (Dành cho khách hàng không đăng bài)
+              </small>
+            </div>
+            <button id="pickImagesBtn" type="button" class="pick-btn">Chọn ảnh/video</button>
+            <input id="checkerImages" type="file" accept="image/*,video/*" multiple hidden>
             <div id="previewGrid" class="preview-grid"></div>
-            <small id="previewCount">Chưa chọn ảnh nào.</small>
+            <small id="previewCount">Chưa chọn file nào.</small>
           </div>
           <button id="submitBtn" class="btn btn-primary submit-btn" type="submit">NHẬN MAGIC TICKET</button>
           <p class="privacy-note">Thông tin chỉ dùng để xác minh và gửi Magic Ticket.</p>
@@ -394,7 +401,7 @@ $reviews = [
       </div>
       <div class="promo-voucher-grid">
         <div class="promo-box"><div class="voucher-label">NHẬN VOUCHER</div><strong>600K</strong><span>Chia sẻ <b>Video Review</b> chuyến đi</span></div>
-        <div class="promo-box"><div class="voucher-label">NHẬN VOUCHER</div><strong>300K</strong><span>Chia sẻ <b>Ảnh Check-in</b> chuyến đi</span></div>
+        <div class="promo-box"><div class="voucher-label">NHẬN VOUCHER</div><strong>300K</strong><span>Chia sẻ <b>Ảnh Checkin</b> chuyến đi</span></div>
       </div>
       <ul class="promo-footer-note"><li>Số lượng có hạn</li><li>Mỗi số điện thoại chỉ được tham gia 1 lần</li></ul>
       <div class="promo-actions"><button id="joinNowBtn" class="btn btn-primary promo-join-btn" type="button">THAM GIA NGAY</button><button id="viewRulesBtn" class="btn btn-secondary promo-rules-btn" type="button">THỂ LỆ</button></div>

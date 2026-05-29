@@ -1,4 +1,6 @@
-const state = { images: [], submitting: false };
+const MAX_MEDIA_FILES = 10;
+const MAX_VIDEO_BYTES = 100 * 1024 * 1024;
+const state = { media: [], submitting: false };
 const $ = (id) => document.getElementById(id);
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -36,7 +38,7 @@ function bindEvents() {
   });
 
   $('pickImagesBtn')?.addEventListener('click', () => $('checkerImages')?.click());
-  $('checkerImages')?.addEventListener('change', handleImageSelect);
+  $('checkerImages')?.addEventListener('change', handleMediaSelect);
   $('magicTicketForm')?.addEventListener('submit', submitForm);
 }
 
@@ -78,22 +80,36 @@ function scrollToForm() {
   window.scrollTo({ top: Math.max(y, 0), behavior: 'smooth' });
 }
 
-async function handleImageSelect(event) {
+async function handleMediaSelect(event) {
   const files = Array.from(event.target.files || []);
-  const available = 10 - state.images.length;
+  const available = MAX_MEDIA_FILES - state.media.length;
   if (available <= 0) {
-    showToast('Chỉ cho phép tối đa 10 ảnh.', true);
+    showToast('Chỉ cho phép tối đa 10 file.', true);
     event.target.value = '';
     return;
   }
-  if (files.length > available) showToast('Chỉ lấy thêm ' + available + ' ảnh.', true);
+  if (files.length > available) showToast('Chỉ lấy thêm ' + available + ' file.', true);
 
   for (const file of files.slice(0, available)) {
-    if (!file.type.startsWith('image/')) continue;
+    if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) continue;
     try {
-      state.images.push(await compressImage(file));
+      if (file.type.startsWith('image/')) {
+        state.media.push(await compressImage(file));
+      } else {
+        if (file.size > MAX_VIDEO_BYTES) {
+          showToast('Video "' + file.name + '" vượt quá 100MB.', true);
+          continue;
+        }
+        state.media.push({
+          kind: 'video',
+          file,
+          name: file.name || 'checkin-video.mp4',
+          mimeType: file.type || 'video/mp4',
+          preview: URL.createObjectURL(file),
+        });
+      }
     } catch (_) {
-      showToast('Có ảnh không thể xử lý. Vui lòng thử ảnh khác.', true);
+      showToast('Có file không thể xử lý. Vui lòng thử file khác.', true);
     }
   }
   renderPreview();
@@ -119,13 +135,21 @@ function compressImage(file) {
         canvas.width = width;
         canvas.height = height;
         canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-        resolve({
-          name: (file.name || 'checkin').replace(/\.[^/.]+$/, '') + '.jpg',
-          mimeType: 'image/jpeg',
-          base64: dataUrl.split(',')[1],
-          preview: dataUrl,
-        });
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            reject(new Error('Cannot compress image'));
+            return;
+          }
+          const name = (file.name || 'checkin').replace(/\.[^/.]+$/, '') + '.jpg';
+          const compressedFile = new File([blob], name, { type: 'image/jpeg' });
+          resolve({
+            kind: 'image',
+            file: compressedFile,
+            name,
+            mimeType: 'image/jpeg',
+            preview: URL.createObjectURL(compressedFile),
+          });
+        }, 'image/jpeg', 0.82);
       };
       img.onerror = reject;
       img.src = e.target.result;
@@ -139,50 +163,55 @@ function renderPreview() {
   const grid = $('previewGrid');
   if (!grid) return;
   grid.innerHTML = '';
-  state.images.forEach((img, index) => {
-    const item = document.createElement('div');
-    item.className = 'preview-item';
-    item.innerHTML = `<img src="${img.preview}" alt="Ảnh ${index + 1}"><button class="remove-btn" type="button">×</button>`;
-    item.querySelector('button').addEventListener('click', () => {
-      state.images.splice(index, 1);
+  state.media.forEach((media, index) => {
+    const previewItem = document.createElement('div');
+    previewItem.className = 'preview-item';
+    previewItem.innerHTML = media.kind === 'video'
+      ? `<video src="${media.preview}" muted playsinline preload="metadata" aria-label="Video ${index + 1}"></video><span class="video-badge">Video</span><button class="remove-btn" type="button">×</button>`
+      : `<img src="${media.preview}" alt="Ảnh ${index + 1}"><button class="remove-btn" type="button">×</button>`;
+    previewItem.querySelector('button').addEventListener('click', () => {
+      URL.revokeObjectURL(media.preview);
+      state.media.splice(index, 1);
       renderPreview();
     });
-    grid.appendChild(item);
+    grid.appendChild(previewItem);
   });
   const count = $('previewCount');
-  if (count) count.textContent = state.images.length ? `Đã chọn ${state.images.length} ảnh.` : 'Chưa chọn ảnh nào.';
+  if (count) count.textContent = state.media.length ? `Đã chọn ${state.media.length} file.` : 'Chưa chọn file nào.';
 }
 
 async function submitForm(event) {
   event.preventDefault();
   if (state.submitting) return;
 
-  const payload = {
-    soDienThoai: $('soDienThoai')?.value.trim() || '',
-    hoTen: $('hoTen')?.value.trim() || '',
-    linkCheckIn: $('linkCheckIn')?.value.trim() || '',
-    platform: detectPlatform(),
-    userAgent: navigator.userAgent || '',
-    images: state.images.map(({ name, mimeType, base64 }) => ({ name, mimeType, base64 })),
-  };
+  const soDienThoai = $('soDienThoai')?.value.trim() || '';
+  const hoTen = $('hoTen')?.value.trim() || '';
+  const linkCheckIn = $('linkCheckIn')?.value.trim() || '';
 
-  if (!payload.soDienThoai) return focusError('soDienThoai', 'Vui lòng nhập số điện thoại.');
-  if (!payload.hoTen) return focusError('hoTen', 'Vui lòng nhập họ tên.');
-  if (!payload.linkCheckIn) return focusError('linkCheckIn', 'Vui lòng dán link check-in.');
+  if (!soDienThoai) return focusError('soDienThoai', 'Vui lòng nhập số điện thoại.');
+  if (!hoTen) return focusError('hoTen', 'Vui lòng nhập họ tên.');
+  if (!linkCheckIn && state.media.length === 0) return focusError('linkCheckIn', 'Vui lòng dán link hoặc tải ảnh/video checkin.');
+
+  const payload = new FormData();
+  payload.append('soDienThoai', soDienThoai);
+  payload.append('hoTen', hoTen);
+  payload.append('linkCheckIn', linkCheckIn);
+  payload.append('platform', detectPlatform());
+  payload.append('userAgent', navigator.userAgent || '');
+  state.media.forEach(({ file }) => payload.append('media[]', file, file.name));
 
   state.submitting = true;
   setSubmitLoading(true);
   try {
     const res = await fetch('submit.php', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: payload,
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.success) throw new Error(data.message || 'Không thể lưu dữ liệu.');
 
     $('magicTicketForm')?.reset();
-    state.images = [];
+    clearMedia();
     renderPreview();
     showToast('Đăng ký thành công. Mã: ' + (data.id || ''));
     setTimeout(showAppPopup, 1200);
@@ -192,6 +221,11 @@ async function submitForm(event) {
     state.submitting = false;
     setSubmitLoading(false);
   }
+}
+
+function clearMedia() {
+  state.media.forEach(({ preview }) => URL.revokeObjectURL(preview));
+  state.media = [];
 }
 
 function focusError(id, message) {

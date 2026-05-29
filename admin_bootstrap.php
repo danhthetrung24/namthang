@@ -54,7 +54,7 @@ function admin_landing_asset_fields(): array
         'logoUrl' => 'Logo',
         'heroBannerImageUrl' => 'Banner chính',
         'popupPromoImageUrl' => 'Ảnh popup khuyến mãi',
-        'checkinGuideImageUrl' => 'Ảnh hướng dẫn check-in',
+        'checkinGuideImageUrl' => 'Ảnh hướng dẫn checkin',
         'whySectionImageUrl' => 'Ảnh lý do chọn',
         'vehicleDefaultImageUrl' => 'Ảnh xe mặc định',
         'vehicle16ImageUrl' => 'Ảnh xe 16 chỗ',

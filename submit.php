@@ -2,14 +2,102 @@
 require __DIR__ . '/lib/helpers.php';
 require __DIR__ . '/lib/SupabaseClient.php';
 
+function normalize_uploaded_files(array $files): array
+{
+    if (!isset($files['name'])) return [];
+
+    if (!is_array($files['name'])) {
+        return [$files];
+    }
+
+    $normalized = [];
+    foreach ($files['name'] as $index => $name) {
+        $normalized[] = [
+            'name' => $name,
+            'type' => $files['type'][$index] ?? '',
+            'tmp_name' => $files['tmp_name'][$index] ?? '',
+            'error' => $files['error'][$index] ?? UPLOAD_ERR_NO_FILE,
+            'size' => $files['size'][$index] ?? 0,
+        ];
+    }
+    return $normalized;
+}
+
+function detect_uploaded_mime(string $tmpName, string $fallback): string
+{
+    $mime = '';
+    if (function_exists('finfo_open')) {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        if ($finfo) {
+            $mime = (string)finfo_file($finfo, $tmpName);
+            finfo_close($finfo);
+        }
+    }
+
+    return $mime !== '' ? $mime : $fallback;
+}
+
+function is_allowed_checkin_media(string $mime): bool
+{
+    return in_array($mime, [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+        'image/gif',
+        'video/mp4',
+        'video/quicktime',
+        'video/webm',
+        'video/x-msvideo',
+        'video/x-m4v',
+    ], true);
+}
+
+function validate_checkin_media(string $mime, int $bytes, int $index): void
+{
+    if (!is_allowed_checkin_media($mime)) {
+        throw new RuntimeException('File số ' . $index . ' không đúng định dạng cho phép.');
+    }
+
+    $isVideo = str_starts_with($mime, 'video/');
+    $limit = $isVideo ? 100 * 1024 * 1024 : 3 * 1024 * 1024;
+    if ($bytes > $limit) {
+        throw new RuntimeException($isVideo
+            ? 'Video số ' . $index . ' vượt quá 100MB.'
+            : 'Ảnh số ' . $index . ' vượt quá 3MB sau khi nén.');
+    }
+}
+
+function media_extension(string $mime): string
+{
+    return match ($mime) {
+        'image/png' => 'png',
+        'image/webp' => 'webp',
+        'image/gif' => 'gif',
+        'video/mp4' => 'mp4',
+        'video/quicktime' => 'mov',
+        'video/webm' => 'webm',
+        'video/x-msvideo' => 'avi',
+        'video/x-m4v' => 'm4v',
+        default => 'jpg',
+    };
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     json_response(['success' => false, 'message' => 'Method not allowed.'], 405);
 }
 
 try {
-    $raw = file_get_contents('php://input');
-    $data = json_decode($raw ?: '', true);
-    if (!is_array($data)) throw new RuntimeException('Dữ liệu gửi lên không hợp lệ.');
+    $isMultipart = str_starts_with((string)($_SERVER['CONTENT_TYPE'] ?? ''), 'multipart/form-data');
+    $data = $_POST;
+    $uploadedFiles = [];
+
+    if ($isMultipart) {
+        $uploadedFiles = normalize_uploaded_files($_FILES['media'] ?? $_FILES['images'] ?? []);
+    } else {
+        $raw = file_get_contents('php://input');
+        $data = json_decode($raw ?: '', true);
+        if (!is_array($data)) throw new RuntimeException('Dữ liệu gửi lên không hợp lệ.');
+    }
 
     $hoTen = trim((string)($data['hoTen'] ?? ''));
     $soDienThoai = trim((string)($data['soDienThoai'] ?? ''));
@@ -21,15 +109,17 @@ try {
     if ($hoTen === '') throw new RuntimeException('Vui lòng nhập họ tên.');
     if ($soDienThoai === '') throw new RuntimeException('Vui lòng nhập số điện thoại.');
     if (!is_valid_vietnam_phone($soDienThoai)) throw new RuntimeException('Số điện thoại không hợp lệ.');
-    if ($linkCheckIn === '') throw new RuntimeException('Vui lòng dán link check-in.');
-    if (!is_valid_checkin_url($linkCheckIn)) throw new RuntimeException('Link check-in phải là Facebook hoặc TikTok.');
+    if ($linkCheckIn !== '' && !is_valid_checkin_url($linkCheckIn)) throw new RuntimeException('Link checkin phải là Facebook hoặc TikTok.');
     if (!is_array($images)) $images = [];
-    if (count($images) > 10) throw new RuntimeException('Chỉ cho phép tối đa 10 ảnh.');
+    if (count($images) + count($uploadedFiles) > 10) throw new RuntimeException('Chỉ cho phép tối đa 10 file.');
+    if ($linkCheckIn === '' && count($images) + count($uploadedFiles) === 0) {
+        throw new RuntimeException('Vui lòng dán link hoặc tải ảnh/video checkin.');
+    }
 
     $supabase = SupabaseClient::fromEnv();
     $phoneNormalized = normalized_phone($soDienThoai);
 
-    // Chặn đăng ký trùng trước khi upload ảnh để tránh tốn Storage.
+    // Chặn đăng ký trùng trước khi upload file để tránh tốn Storage.
     $existing = $supabase->findRegistrationByPhone($phoneNormalized);
     if (!empty($existing)) {
         throw new RuntimeException('Số điện thoại này đã đăng ký nhận Magic Ticket. Mỗi số điện thoại chỉ được đăng ký 1 lần.');
@@ -42,28 +132,48 @@ try {
     $fileNames = [];
     $fileLinks = [];
 
+    foreach ($uploadedFiles as $index => $file) {
+        $uploadError = (int)($file['error'] ?? UPLOAD_ERR_NO_FILE);
+        if ($uploadError !== UPLOAD_ERR_OK) {
+            throw new RuntimeException('File số ' . ($index + 1) . ' tải lên không thành công.');
+        }
+
+        $tmpName = (string)($file['tmp_name'] ?? '');
+        if ($tmpName === '' || !is_uploaded_file($tmpName)) {
+            throw new RuntimeException('File số ' . ($index + 1) . ' không đọc được.');
+        }
+
+        $bytes = file_get_contents($tmpName);
+        if ($bytes === false) throw new RuntimeException('File số ' . ($index + 1) . ' không đọc được.');
+
+        $mime = detect_uploaded_mime($tmpName, (string)($file['type'] ?? ''));
+        validate_checkin_media($mime, strlen($bytes), $index + 1);
+
+        $name = safe_file_name((string)($file['name'] ?? ('checkin_' . ($index + 1) . media_extension($mime))));
+        $name = preg_replace('/\.[^.]+$/', '', $name) . '.' . media_extension($mime);
+        $path = $folder . '/' . ($index + 1) . '_' . $name;
+
+        $supabase->uploadObject($bucket, $path, $bytes, $mime);
+        $fileNames[] = $name;
+        $fileLinks[] = $supabase->publicUrl($bucket, $path);
+    }
+
+    $jsonStartIndex = count($uploadedFiles);
     foreach ($images as $index => $img) {
         if (!is_array($img) || empty($img['base64'])) continue;
 
         $mime = (string)($img['mimeType'] ?? 'image/jpeg');
-        if (!in_array($mime, ['image/jpeg', 'image/png', 'image/webp', 'image/gif'], true)) {
-            throw new RuntimeException('Ảnh số ' . ($index + 1) . ' không đúng định dạng cho phép.');
-        }
+        $displayIndex = $jsonStartIndex + $index + 1;
+        if (!is_allowed_checkin_media($mime)) throw new RuntimeException('File số ' . $displayIndex . ' không đúng định dạng cho phép.');
 
         $base64 = preg_replace('/\s+/', '', (string)$img['base64']);
         $bytes = base64_decode($base64, true);
-        if ($bytes === false) throw new RuntimeException('Ảnh số ' . ($index + 1) . ' không đọc được.');
-        if (strlen($bytes) > 3 * 1024 * 1024) throw new RuntimeException('Ảnh số ' . ($index + 1) . ' vượt quá 3MB sau khi nén.');
+        if ($bytes === false) throw new RuntimeException('File số ' . $displayIndex . ' không đọc được.');
+        validate_checkin_media($mime, strlen($bytes), $displayIndex);
 
         $name = safe_file_name((string)($img['name'] ?? ('checkin_' . ($index + 1) . '.jpg')));
-        $ext = match ($mime) {
-            'image/png' => 'png',
-            'image/webp' => 'webp',
-            'image/gif' => 'gif',
-            default => 'jpg',
-        };
-        $name = preg_replace('/\.[^.]+$/', '', $name) . '.' . $ext;
-        $path = $folder . '/' . ($index + 1) . '_' . $name;
+        $name = preg_replace('/\.[^.]+$/', '', $name) . '.' . media_extension($mime);
+        $path = $folder . '/' . $displayIndex . '_' . $name;
 
         $supabase->uploadObject($bucket, $path, $bytes, $mime);
         $fileNames[] = $name;
@@ -87,6 +197,7 @@ try {
         'success' => true,
         'message' => 'Đăng ký nhận Magic Ticket thành công.',
         'id' => $rowId,
+        'fileCount' => count($fileLinks),
         'imageCount' => count($fileLinks),
         'data' => $inserted[0] ?? null,
     ]);
