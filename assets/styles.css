@@ -644,6 +644,13 @@ textarea{
   font-weight:900;
 }
 
+.note-box li.note-bullet span{
+  width:8px;
+  height:8px;
+  margin:8px 0 0 8px;
+  background:#7a4b22;
+}
+
 .note-box li p{
   margin:0;
   font-weight:800;
