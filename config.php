@@ -4,7 +4,7 @@
  * Chỉnh nội dung landing page tại đây.
  */
 
-const APP_VERSION = '2026-05-29 checkin-media-upload';
+const APP_VERSION = '2026-05-29 checkin-note-layout';
 
 return [
     'brandName' => 'NAM THẮNG TRAVEL BUS',

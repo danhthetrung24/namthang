@@ -206,12 +206,12 @@ $reviews = [
         <div class="note-box">
           <strong>Lưu ý:</strong>
           <ul>
-            <li>Voucher sẽ tự động gửi vào phần Ưu Đãi trên App Taxi Nam Thắng sau 24h.</li>
-            <li>Ảnh checkin: nhận Voucher Magic Ticket 300K</li>
-            <li>Video review: nhận Voucher Magic Ticket 600K</li>
-            <li>Ảnh và video gửi về sẽ được đăng lại trên trang Nam Thắng Travel Bus.</li>
-            <li>Voucher áp dụng toàn bộ hệ thống Taxi điện Nam Thắng tại các tỉnh Miền Tây.</li>
-            <li>Nếu chưa có ứng dụng, bạn vui lòng Tải App Taxi Nam Thắng <a href="<?= e($config['iosLink'] ?? $config['androidLink'] ?? '#') ?>" target="_blank" rel="noopener noreferrer">tại đây</a>.</li>
+            <li><span>1</span><p>Voucher sẽ tự động gửi vào phần Ưu Đãi trên App Taxi Nam Thắng sau 24h.</p></li>
+            <li><span>2</span><p>Ảnh checkin: nhận Voucher Magic Ticket 300K.</p></li>
+            <li><span>3</span><p>Video review: nhận Voucher Magic Ticket 600K.</p></li>
+            <li><span>4</span><p>Ảnh và video gửi về sẽ được đăng lại trên trang Nam Thắng Travel Bus.</p></li>
+            <li><span>5</span><p>Voucher áp dụng toàn bộ hệ thống Taxi điện Nam Thắng tại các tỉnh Miền Tây.</p></li>
+            <li><span>6</span><p>Nếu chưa có ứng dụng, bạn vui lòng Tải App Taxi Nam Thắng <a href="<?= e($config['iosLink'] ?? $config['androidLink'] ?? '#') ?>" target="_blank" rel="noopener noreferrer">tại đây</a>.</p></li>
           </ul>
         </div>
       </div>
@@ -226,10 +226,7 @@ $reviews = [
           <div class="upload-box">
             <div>
               <strong>Tải lên ảnh/video checkin trực tiếp</strong>
-              <small>
-                - Link bài viết checkin (Nếu có)<br>
-                - Tải lên ảnh/video checkin trực tiếp (Dành cho khách hàng không đăng bài)
-              </small>
+              <small>(Dành cho khách hàng không đăng bài)</small>
             </div>
             <button id="pickImagesBtn" type="button" class="pick-btn">Chọn ảnh/video</button>
             <input id="checkerImages" type="file" accept="image/*,video/*" multiple hidden>
