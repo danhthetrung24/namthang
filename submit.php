@@ -82,6 +82,34 @@ function media_extension(string $mime): string
     };
 }
 
+function post_json_webhook(string $url, array $payload): array
+{
+    $ch = curl_init($url);
+    if (!$ch) throw new RuntimeException('Không thể khởi tạo webhook.');
+
+    $body = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    curl_setopt_array($ch, [
+        CURLOPT_POST => true,
+        CURLOPT_HTTPHEADER => ['Content-Type: application/json; charset=utf-8'],
+        CURLOPT_POSTFIELDS => $body,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 12,
+    ]);
+
+    $response = curl_exec($ch);
+    $status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    $error = curl_error($ch);
+    curl_close($ch);
+
+    if ($response === false) throw new RuntimeException('Lỗi kết nối webhook: ' . $error);
+    if ($status < 200 || $status >= 300) {
+        throw new RuntimeException('Webhook trả lỗi HTTP ' . $status . ': ' . $response);
+    }
+
+    $decoded = json_decode((string)$response, true);
+    return is_array($decoded) ? $decoded : ['raw' => $response];
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     json_response(['success' => false, 'message' => 'Method not allowed.'], 405);
 }
@@ -193,12 +221,37 @@ try {
         'status' => 'new',
     ]);
 
+    $webhookOk = true;
+    $webhookError = null;
+    $webhookResponse = null;
+    try {
+        $webhookResponse = post_json_webhook('https://n8n.taxinamthang.vn/webhook/xe-bus', [
+            'id' => $rowId,
+            'hoTen' => $hoTen,
+            'soDienThoai' => $phoneNormalized,
+            'linkCheckIn' => $linkCheckIn,
+            'platform' => $platform,
+            'userAgent' => $userAgent,
+            'fileCount' => count($fileLinks),
+            'fileNames' => $fileNames,
+            'fileLinks' => $fileLinks,
+            'status' => 'new',
+            'createdAt' => gmdate('c'),
+        ]);
+    } catch (Throwable $webhookException) {
+        $webhookOk = false;
+        $webhookError = $webhookException->getMessage();
+    }
+
     json_response([
         'success' => true,
         'message' => 'Đăng ký nhận Magic Ticket thành công.',
         'id' => $rowId,
         'fileCount' => count($fileLinks),
         'imageCount' => count($fileLinks),
+        'webhookOk' => $webhookOk,
+        'webhookError' => $webhookError,
+        'webhookResponse' => $webhookResponse,
         'data' => $inserted[0] ?? null,
     ]);
 } catch (Throwable $e) {
