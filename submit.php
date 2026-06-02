@@ -82,16 +82,14 @@ function media_extension(string $mime): string
     };
 }
 
-function post_json_webhook(string $url, array $payload): array
+function call_get_webhook(string $url, array $payload): array
 {
-    $ch = curl_init($url);
+    $query = http_build_query($payload);
+    $separator = str_contains($url, '?') ? '&' : '?';
+    $ch = curl_init($url . $separator . $query);
     if (!$ch) throw new RuntimeException('Không thể khởi tạo webhook.');
 
-    $body = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     curl_setopt_array($ch, [
-        CURLOPT_POST => true,
-        CURLOPT_HTTPHEADER => ['Content-Type: application/json; charset=utf-8'],
-        CURLOPT_POSTFIELDS => $body,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_TIMEOUT => 12,
     ]);
@@ -225,7 +223,7 @@ try {
     $webhookError = null;
     $webhookResponse = null;
     try {
-        $webhookResponse = post_json_webhook('https://n8n.taxinamthang.vn/webhook/xe-bus', [
+        $webhookResponse = call_get_webhook('https://n8n.taxinamthang.vn/webhook/xe-bus', [
             'id' => $rowId,
             'hoTen' => $hoTen,
             'soDienThoai' => $phoneNormalized,
