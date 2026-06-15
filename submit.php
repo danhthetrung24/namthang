@@ -146,6 +146,58 @@ function save_local_upload(string $folder, string $name, string $bytes): string
     return public_upload_url($relativePath);
 }
 
+function remote_upload_enabled(): bool
+{
+    return trim((string)env_value('VPS_UPLOAD_ENDPOINT', '')) !== ''
+        && trim((string)env_value('VPS_UPLOAD_TOKEN', '')) !== '';
+}
+
+function save_remote_upload(string $folder, string $name, string $bytes, string $mime): string
+{
+    if (!function_exists('curl_init')) {
+        throw new RuntimeException('Server chua ho tro curl de upload file len VPS.');
+    }
+
+    $endpoint = trim((string)env_value('VPS_UPLOAD_ENDPOINT', ''));
+    $token = trim((string)env_value('VPS_UPLOAD_TOKEN', ''));
+    if ($endpoint === '' || $token === '') {
+        throw new RuntimeException('Chua cau hinh VPS_UPLOAD_ENDPOINT/VPS_UPLOAD_TOKEN.');
+    }
+
+    $relativePath = trim($folder, '/') . '/' . ltrim($name, '/');
+    $ch = curl_init($endpoint);
+    if (!$ch) throw new RuntimeException('Khong the khoi tao ket noi upload VPS.');
+
+    curl_setopt_array($ch, [
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => $bytes,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 90,
+        CURLOPT_HTTPHEADER => [
+            'Content-Type: ' . $mime,
+            'X-Upload-Token: ' . $token,
+            'X-Upload-Path: ' . $relativePath,
+        ],
+    ]);
+
+    $response = curl_exec($ch);
+    $status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    $error = curl_error($ch);
+    curl_close($ch);
+
+    if ($response === false) {
+        throw new RuntimeException('Loi ket noi upload VPS: ' . $error);
+    }
+
+    $decoded = json_decode((string)$response, true);
+    if ($status < 200 || $status >= 300 || !is_array($decoded) || empty($decoded['success']) || empty($decoded['url'])) {
+        $message = is_array($decoded) && isset($decoded['message']) ? (string)$decoded['message'] : (string)$response;
+        throw new RuntimeException('Upload VPS that bai: ' . $message);
+    }
+
+    return (string)$decoded['url'];
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     json_response(['success' => false, 'message' => 'Method not allowed.'], 405);
 }
@@ -221,6 +273,8 @@ try {
         if ($storageUsesSupabase) {
             $database->uploadObject($bucket, $path, $bytes, $mime);
             $fileLinks[] = $database->publicUrl($bucket, $path);
+        } elseif (remote_upload_enabled()) {
+            $fileLinks[] = save_remote_upload($folder, ($index + 1) . '_' . $name, $bytes, $mime);
         } else {
             $fileLinks[] = save_local_upload($folder, ($index + 1) . '_' . $name, $bytes);
         }
@@ -247,6 +301,8 @@ try {
         if ($storageUsesSupabase) {
             $database->uploadObject($bucket, $path, $bytes, $mime);
             $fileLinks[] = $database->publicUrl($bucket, $path);
+        } elseif (remote_upload_enabled()) {
+            $fileLinks[] = save_remote_upload($folder, $displayIndex . '_' . $name, $bytes, $mime);
         } else {
             $fileLinks[] = save_local_upload($folder, $displayIndex . '_' . $name, $bytes);
         }
