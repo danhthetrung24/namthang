@@ -57,6 +57,10 @@ function admin_is_video_url(string $url): bool
   <style>
     :root{--brand:#8BC34A;--accent:#ed111b;--text:#26391a;--muted:#607059;--bg:#f4fbf2;--card:#fff;--line:#dfead8;--shadow:0 14px 34px rgba(31,45,26,.10)}
     *{box-sizing:border-box} body{margin:0;font-family:Arial,'Helvetica Neue',sans-serif;color:var(--text);background:linear-gradient(180deg,#eef9f7,#f7fff2);font-size:14px} a{color:#16781d;text-decoration:none;font-weight:700} .wrap{width:min(100% - 28px,1280px);margin:0 auto;padding:24px 0 44px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}.title h1{margin:0 0 6px;font-size:28px}.title p{margin:0;color:var(--muted);font-weight:700}.actions{display:flex;gap:10px;flex-wrap:wrap}.btn{border:0;border-radius:999px;background:var(--brand);color:#1e3515;padding:11px 16px;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}.btn.red{background:var(--accent);color:#fff}.btn.light{background:#fff;border:1px solid var(--line)}.admin-nav{display:flex;gap:8px;margin:0 0 16px;padding:6px;background:rgba(255,255,255,.72);border:1px solid var(--line);border-radius:999px;width:max-content;max-width:100%;box-shadow:var(--shadow)}.nav-link{padding:10px 16px;border-radius:999px;color:#315516;font-weight:900}.nav-link.active{background:var(--brand);color:#1e3515}.card{background:rgba(255,255,255,.94);border:1px solid rgba(139,195,74,.22);border-radius:22px;box-shadow:var(--shadow);padding:16px;margin-bottom:16px}.filters{display:grid;grid-template-columns:1.6fr .9fr .75fr .75fr auto;gap:10px;align-items:end}.field label{display:block;margin:0 0 6px;color:#315516;font-weight:900}.field input,.field select{width:100%;border:1.5px solid #d6e3cc;border-radius:14px;padding:11px 12px;background:#fbfdf8;outline:none}.asset-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}.asset-head h2{margin:0 0 5px;font-size:20px}.asset-head p{margin:0;color:var(--muted);font-weight:700}.asset-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.asset-field{display:grid;gap:6px}.asset-field label{color:#315516;font-weight:900}.asset-field input{width:100%;border:1.5px solid #d6e3cc;border-radius:14px;padding:11px 12px;background:#fbfdf8;outline:none}.asset-default{display:block;color:var(--muted);font-size:12px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.notice{background:#f6ffed;color:#315516;border:1px solid #b7eb8f;border-radius:16px;padding:12px 14px;margin-bottom:16px;font-weight:800}.alert{background:#fff1f0;color:#a8071a;border:1px solid #ffa39e;border-radius:16px;padding:12px 14px;margin-bottom:16px;font-weight:800}.table-wrap{overflow:auto;border-radius:18px;border:1px solid var(--line);background:#fff}table{width:100%;border-collapse:separate;border-spacing:0;min-width:1080px}th,td{padding:12px;border-bottom:1px solid #edf2e8;text-align:left;vertical-align:top}th{position:sticky;top:0;background:#eef9df;color:#315516;font-size:12px;text-transform:uppercase;z-index:1}tr:hover td{background:#fbfff8}.id{font-family:monospace;font-size:12px;color:#667}.phone{font-weight:900;white-space:nowrap}.status{border:1px solid #d6e3cc;border-radius:999px;padding:7px 10px;background:#fbfdf8;font-weight:800}.status-form{display:flex;gap:6px;align-items:center}.images{display:flex;gap:8px;flex-wrap:wrap;max-width:260px}.thumb{width:62px;height:62px;border-radius:12px;object-fit:cover;border:1px solid #dfead8;background:#f3f7ef}.empty{padding:32px;text-align:center;color:var(--muted);font-weight:800}.pagination{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:12px}.small{font-size:12px;color:var(--muted)}.warn{margin-top:10px;color:#9a6700;font-weight:800}.link-cell{max-width:220px;word-break:break-all}.nowrap{white-space:nowrap}@media(max-width:900px){.top{align-items:flex-start;flex-direction:column}.admin-nav{width:100%;border-radius:18px}.nav-link{flex:1;text-align:center}.filters,.asset-grid{grid-template-columns:1fr}.filters .submit-filter{grid-column:1/-1}.btn{width:100%}.actions{width:100%}.actions .btn{flex:1}.asset-head{flex-direction:column}.wrap{width:min(100% - 20px,1280px);padding-top:16px}}
+    .file-list{display:flex;gap:6px;flex-wrap:wrap;max-width:260px}
+    .file-chip{display:inline-flex;align-items:center;justify-content:center;border:1px solid #d6e3cc;border-radius:999px;padding:5px 9px;background:#f6fbf2;color:#16781d;font-size:12px;font-weight:900;white-space:nowrap}
+    .file-chip.video{background:#fff8ef;border-color:#f4dfc6;color:#8a4b18}
+    .file-count{display:block;margin-top:5px}
   </style>
 </head>
 <body>
@@ -181,18 +185,18 @@ function admin_is_video_url(string $url): bool
             </td>
             <td>
               <?php if ($links): ?>
-                <div class="images">
+                <div class="file-list">
                   <?php foreach ($links as $i => $url): ?>
                     <a href="<?= e($url) ?>" target="_blank" rel="noopener" title="Mở file <?= $i + 1 ?>">
                       <?php if (admin_is_video_url((string)$url)): ?>
-                        <video class="thumb" src="<?= e($url) ?>" muted playsinline preload="metadata"></video>
+                        <span class="file-chip video">Video <?= $i + 1 ?></span>
                       <?php else: ?>
-                        <img class="thumb" src="<?= e($url) ?>" alt="File <?= $i + 1 ?>" loading="lazy">
+                        <span class="file-chip">File <?= $i + 1 ?></span>
                       <?php endif; ?>
                     </a>
                   <?php endforeach; ?>
                 </div>
-                <div class="small"><?= count($links) ?> file</div>
+                <span class="small file-count"><?= count($links) ?> file</span>
               <?php else: ?>
                 <span class="small">Không có file</span>
               <?php endif; ?>
