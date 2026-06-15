@@ -47,6 +47,13 @@ function admin_is_video_url(string $url): bool
     $path = parse_url($url, PHP_URL_PATH) ?: '';
     return (bool)preg_match('/\.(mp4|mov|webm|avi|m4v)$/i', $path);
 }
+
+function admin_is_supabase_storage_url(string $url): bool
+{
+    $host = parse_url($url, PHP_URL_HOST) ?: '';
+    $path = parse_url($url, PHP_URL_PATH) ?: '';
+    return str_ends_with(strtolower($host), '.supabase.co') && str_contains($path, '/storage/v1/');
+}
 ?>
 <!doctype html>
 <html lang="vi">
@@ -60,6 +67,7 @@ function admin_is_video_url(string $url): bool
     .file-list{display:flex;gap:6px;flex-wrap:wrap;max-width:260px}
     .file-chip{display:inline-flex;align-items:center;justify-content:center;border:1px solid #d6e3cc;border-radius:999px;padding:5px 9px;background:#f6fbf2;color:#16781d;font-size:12px;font-weight:900;white-space:nowrap}
     .file-chip.video{background:#fff8ef;border-color:#f4dfc6;color:#8a4b18}
+    .file-chip.legacy{background:#fff7e6;border-color:#ffd591;color:#ad6800}
     .file-count{display:block;margin-top:5px}
   </style>
 </head>
@@ -187,8 +195,16 @@ function admin_is_video_url(string $url): bool
               <?php if ($links): ?>
                 <div class="file-list">
                   <?php foreach ($links as $i => $url): ?>
-                    <a href="<?= e($url) ?>" target="_blank" rel="noopener" title="Mở file <?= $i + 1 ?>">
-                      <?php if (admin_is_video_url((string)$url)): ?>
+                    <?php
+                      $fileUrl = (string)$url;
+                      $isVideo = admin_is_video_url($fileUrl);
+                      $isLegacy = admin_is_supabase_storage_url($fileUrl);
+                      $openUrl = $isLegacy ? 'admin_file.php?url=' . rawurlencode($fileUrl) : $fileUrl;
+                    ?>
+                    <a href="<?= e($openUrl) ?>" target="_blank" rel="noopener" title="Mở file <?= $i + 1 ?>">
+                      <?php if ($isLegacy): ?>
+                        <span class="file-chip legacy">File cũ <?= $i + 1 ?></span>
+                      <?php elseif ($isVideo): ?>
                         <span class="file-chip video">Video <?= $i + 1 ?></span>
                       <?php else: ?>
                         <span class="file-chip">File <?= $i + 1 ?></span>
