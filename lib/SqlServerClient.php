@@ -20,8 +20,17 @@ final class SqlServerClient
             throw new RuntimeException('Thiếu SQLSRV_HOST, SQLSRV_USERNAME hoặc SQLSRV_PASSWORD trong .env.');
         }
 
-        $server = str_contains($host, ',') ? $host : $host . ',' . $port;
-        $dsn = 'sqlsrv:Server=' . $server . ';Database=' . $database . ';TrustServerCertificate=1';
+        $drivers = PDO::getAvailableDrivers();
+        if (in_array('sqlsrv', $drivers, true)) {
+            $server = str_contains($host, ',') ? $host : $host . ',' . $port;
+            $dsn = 'sqlsrv:Server=' . $server . ';Database=' . $database . ';TrustServerCertificate=1';
+        } elseif (in_array('dblib', $drivers, true)) {
+            $cleanHost = str_contains($host, ',') ? str_replace(',', ':', $host) : $host . ':' . $port;
+            $dsn = 'dblib:host=' . $cleanHost . ';dbname=' . $database . ';charset=UTF-8';
+        } else {
+            throw new RuntimeException('PHP thiếu driver SQL Server. Cần cài pdo_sqlsrv hoặc pdo_dblib.');
+        }
+
         $pdo = new PDO($dsn, $username, $password, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
