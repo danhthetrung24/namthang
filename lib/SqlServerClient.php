@@ -95,11 +95,14 @@ SQL);
         $sql = 'SELECT * FROM dbo.magic_ticket_registrations';
         if ($where) $sql .= ' WHERE ' . implode(' AND ', $where);
         $sql .= ' ORDER BY created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY';
-        $params[] = $offset;
-        $params[] = $limit;
 
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
+        foreach ($params as $index => $value) {
+            $stmt->bindValue($index + 1, $value);
+        }
+        $stmt->bindValue(count($params) + 1, $offset, PDO::PARAM_INT);
+        $stmt->bindValue(count($params) + 2, $limit, PDO::PARAM_INT);
+        $stmt->execute();
         return array_map(fn($row) => $this->hydrateRegistration($row), $stmt->fetchAll());
     }
 
