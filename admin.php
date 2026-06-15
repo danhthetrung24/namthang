@@ -20,7 +20,7 @@ $defaultAssets = $config['assets'] ?? [];
 $savedAssets = [];
 
 try {
-    $supabase = SupabaseClient::fromEnv();
+    $supabase = DatabaseClient::fromEnv();
     if ($view === 'registrations') {
         $rows = $supabase->listRegistrations($filters, $perPage + 1, $offset);
         $hasNext = count($rows) > $perPage;

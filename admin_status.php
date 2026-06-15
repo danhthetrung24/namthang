@@ -17,7 +17,7 @@ if (!in_array($status, $allowed, true)) {
 }
 
 try {
-    SupabaseClient::fromEnv()->updateRegistrationStatus($id, $status);
+    DatabaseClient::fromEnv()->updateRegistrationStatus($id, $status);
 } catch (Throwable $e) {
     $separator = str_contains($redirect, '?') ? '&' : '?';
     $redirect .= $separator . 'error=' . rawurlencode($e->getMessage());

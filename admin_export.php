@@ -6,7 +6,7 @@ $filters = admin_filters_from_request();
 $statusOptions = admin_status_options();
 
 try {
-    $rows = SupabaseClient::fromEnv()->listRegistrations($filters, 5000, 0);
+    $rows = DatabaseClient::fromEnv()->listRegistrations($filters, 5000, 0);
 } catch (Throwable $e) {
     http_response_code(500);
     echo 'Không thể xuất Excel: ' . e($e->getMessage());

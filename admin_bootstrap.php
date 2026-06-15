@@ -1,6 +1,6 @@
 <?php
 require __DIR__ . '/lib/helpers.php';
-require __DIR__ . '/lib/SupabaseClient.php';
+require __DIR__ . '/lib/DatabaseClient.php';
 
 function admin_env_username(): string
 {

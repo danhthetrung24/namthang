@@ -20,7 +20,7 @@ foreach ($fields as $key => $_label) {
 }
 
 try {
-    SupabaseClient::fromEnv()->upsertLandingAssets($assets);
+    DatabaseClient::fromEnv()->upsertLandingAssets($assets);
     header('Location: admin.php?view=media&assets=saved');
 } catch (Throwable $e) {
     header('Location: admin.php?view=media&asset_error=' . rawurlencode($e->getMessage()));

@@ -8,5 +8,8 @@
 storage/cache/*
 !storage/cache/.gitkeep
 
+uploads/checkin/*
+!uploads/checkin/.gitkeep
+
 .DS_Store
 Thumbs.db

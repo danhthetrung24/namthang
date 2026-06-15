@@ -1,6 +1,6 @@
 <?php
 require __DIR__ . '/lib/helpers.php';
-require __DIR__ . '/lib/SupabaseClient.php';
+require __DIR__ . '/lib/DatabaseClient.php';
 
 function normalize_uploaded_files(array $files): array
 {
@@ -108,6 +108,44 @@ function call_get_webhook(string $url, array $payload): array
     return is_array($decoded) ? $decoded : ['raw' => $response];
 }
 
+function app_base_url(): string
+{
+    $configured = trim((string)env_value('APP_BASE_URL', ''));
+    if ($configured !== '') return rtrim($configured, '/');
+
+    $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+    $scheme = $https ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    return $scheme . '://' . $host;
+}
+
+function public_upload_url(string $relativePath): string
+{
+    $parts = array_map(
+        static fn($part) => rawurlencode($part),
+        explode('/', str_replace('\\', '/', trim($relativePath, '/')))
+    );
+    return app_base_url() . '/' . implode('/', $parts);
+}
+
+function save_local_upload(string $folder, string $name, string $bytes): string
+{
+    $baseDir = __DIR__ . '/uploads/checkin';
+    $dir = $baseDir . '/' . $folder;
+    if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
+        throw new RuntimeException('Không thể tạo thư mục upload.');
+    }
+
+    $relativePath = 'uploads/checkin/' . $folder . '/' . $name;
+    $fullPath = __DIR__ . '/' . $relativePath;
+    if (file_put_contents($fullPath, $bytes) === false) {
+        throw new RuntimeException('Không thể lưu file upload.');
+    }
+
+    return public_upload_url($relativePath);
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     json_response(['success' => false, 'message' => 'Method not allowed.'], 405);
 }
@@ -142,11 +180,12 @@ try {
         throw new RuntimeException('Vui lòng dán link hoặc tải ảnh/video checkin.');
     }
 
-    $supabase = SupabaseClient::fromEnv();
+    $storageUsesSupabase = !DatabaseClient::isSqlServer();
+    $database = DatabaseClient::fromEnv();
     $phoneNormalized = normalized_phone($soDienThoai);
 
     // Chặn đăng ký trùng trước khi upload file để tránh tốn Storage.
-    $existing = $supabase->findRegistrationByPhone($phoneNormalized);
+    $existing = $database->findRegistrationByPhone($phoneNormalized);
     if (!empty($existing)) {
         throw new RuntimeException('Số điện thoại này đã đăng ký nhận Magic Ticket. Mỗi số điện thoại chỉ được đăng ký 1 lần.');
     }
@@ -179,9 +218,13 @@ try {
         $name = preg_replace('/\.[^.]+$/', '', $name) . '.' . media_extension($mime);
         $path = $folder . '/' . ($index + 1) . '_' . $name;
 
-        $supabase->uploadObject($bucket, $path, $bytes, $mime);
+        if ($storageUsesSupabase) {
+            $database->uploadObject($bucket, $path, $bytes, $mime);
+            $fileLinks[] = $database->publicUrl($bucket, $path);
+        } else {
+            $fileLinks[] = save_local_upload($folder, ($index + 1) . '_' . $name, $bytes);
+        }
         $fileNames[] = $name;
-        $fileLinks[] = $supabase->publicUrl($bucket, $path);
     }
 
     $jsonStartIndex = count($uploadedFiles);
@@ -201,12 +244,16 @@ try {
         $name = preg_replace('/\.[^.]+$/', '', $name) . '.' . media_extension($mime);
         $path = $folder . '/' . $displayIndex . '_' . $name;
 
-        $supabase->uploadObject($bucket, $path, $bytes, $mime);
+        if ($storageUsesSupabase) {
+            $database->uploadObject($bucket, $path, $bytes, $mime);
+            $fileLinks[] = $database->publicUrl($bucket, $path);
+        } else {
+            $fileLinks[] = save_local_upload($folder, $displayIndex . '_' . $name, $bytes);
+        }
         $fileNames[] = $name;
-        $fileLinks[] = $supabase->publicUrl($bucket, $path);
     }
 
-    $inserted = $supabase->insertRegistration([
+    $inserted = $database->insertRegistration([
         'id' => $rowId,
         'ho_ten' => $hoTen,
         'so_dien_thoai' => $phoneNormalized,

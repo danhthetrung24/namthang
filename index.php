@@ -1,10 +1,10 @@
 <?php
 require __DIR__ . '/lib/helpers.php';
-require __DIR__ . '/lib/SupabaseClient.php';
+require __DIR__ . '/lib/DatabaseClient.php';
 $config = require __DIR__ . '/config.php';
 $assets = $config['assets'] ?? [];
 try {
-    foreach (SupabaseClient::fromEnv()->listLandingAssets() as $assetRow) {
+    foreach (DatabaseClient::fromEnv()->listLandingAssets() as $assetRow) {
         $assetKey = (string)($assetRow['asset_key'] ?? '');
         $assetUrl = trim((string)($assetRow['asset_url'] ?? ''));
         if ($assetKey !== '' && $assetUrl !== '') $assets[$assetKey] = $assetUrl;
