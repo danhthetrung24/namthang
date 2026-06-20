@@ -5,6 +5,15 @@ RUN apt-get update \
     && docker-php-ext-install pdo_dblib curl \
     && rm -rf /var/lib/apt/lists/*
 
+RUN { \
+        echo "upload_max_filesize=120M"; \
+        echo "post_max_size=125M"; \
+        echo "max_file_uploads=10"; \
+        echo "max_execution_time=180"; \
+        echo "max_input_time=180"; \
+        echo "memory_limit=256M"; \
+    } > /usr/local/etc/php/conf.d/namthang-uploads.ini
+
 WORKDIR /app
 COPY . /app
 
