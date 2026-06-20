@@ -69,6 +69,14 @@ function admin_is_supabase_storage_url(string $url): bool
     .file-chip.video{background:#fff8ef;border-color:#f4dfc6;color:#8a4b18}
     .file-chip.legacy{background:#fff7e6;border-color:#ffd591;color:#ad6800}
     .file-count{display:block;margin-top:5px}
+    .video-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(18,28,14,.72);z-index:50}
+    .video-modal.open{display:flex}
+    .video-box{width:min(100%,860px);background:#fff;border-radius:18px;box-shadow:0 22px 60px rgba(0,0,0,.28);overflow:hidden}
+    .video-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid #edf2e8}
+    .video-head strong{color:#315516}
+    .video-close{border:0;border-radius:999px;width:34px;height:34px;background:#f3f7ef;color:#26391a;font-size:22px;font-weight:900;cursor:pointer;line-height:1}
+    .video-player{display:block;width:100%;max-height:72vh;background:#000}
+    .video-actions{display:flex;justify-content:flex-end;padding:10px 14px;border-top:1px solid #edf2e8}
   </style>
 </head>
 <body>
@@ -201,7 +209,7 @@ function admin_is_supabase_storage_url(string $url): bool
                       $isLegacy = admin_is_supabase_storage_url($fileUrl);
                       $openUrl = $isLegacy ? 'admin_file.php?url=' . rawurlencode($fileUrl) : $fileUrl;
                     ?>
-                    <a href="<?= e($openUrl) ?>" target="_blank" rel="noopener" title="Mở file <?= $i + 1 ?>">
+                    <a href="<?= e($openUrl) ?>" <?= (!$isLegacy && $isVideo) ? 'data-video-url="' . e($fileUrl) . '"' : 'target="_blank" rel="noopener"' ?> title="Mở file <?= $i + 1 ?>">
                       <?php if ($isLegacy): ?>
                         <span class="file-chip legacy">File cũ <?= $i + 1 ?></span>
                       <?php elseif ($isVideo): ?>
@@ -250,5 +258,55 @@ function admin_is_supabase_storage_url(string $url): bool
   </div>
   <?php endif; ?>
 </div>
+<div class="video-modal" id="videoModal" aria-hidden="true">
+  <div class="video-box" role="dialog" aria-modal="true" aria-label="Xem video checkin">
+    <div class="video-head">
+      <strong>Video checkin</strong>
+      <button class="video-close" type="button" id="videoClose" aria-label="Đóng">×</button>
+    </div>
+    <video class="video-player" id="videoPlayer" controls playsinline preload="metadata"></video>
+    <div class="video-actions">
+      <a class="btn light" id="videoOpenLink" href="#" target="_blank" rel="noopener">Mở tab mới</a>
+    </div>
+  </div>
+</div>
+<script>
+(() => {
+  const modal = document.getElementById('videoModal');
+  const player = document.getElementById('videoPlayer');
+  const closeBtn = document.getElementById('videoClose');
+  const openLink = document.getElementById('videoOpenLink');
+  if (!modal || !player || !closeBtn || !openLink) return;
+
+  const close = () => {
+    player.pause();
+    player.removeAttribute('src');
+    player.load();
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+  };
+
+  document.addEventListener('click', (event) => {
+    const link = event.target.closest('[data-video-url]');
+    if (!link) return;
+    event.preventDefault();
+    const url = link.getAttribute('data-video-url');
+    if (!url) return;
+    player.src = url;
+    openLink.href = url;
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    player.focus();
+  });
+
+  closeBtn.addEventListener('click', close);
+  modal.addEventListener('click', (event) => {
+    if (event.target === modal) close();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && modal.classList.contains('open')) close();
+  });
+})();
+</script>
 </body>
 </html>
